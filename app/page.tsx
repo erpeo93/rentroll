@@ -12,7 +12,7 @@ const HomePage = () => {
 
   useEffect(() => {
     // Mock: just return first 4 items for now
-    const personalized = mockProducts.slice(0, 4);
+    const personalized = mockProducts as Product[];
     setSuggested(personalized);
   }, []);
 
