@@ -2,10 +2,11 @@
 
 import React, { useEffect, useState } from "react";
 import Head from "next/head";
-import ProductCard from "./components/ProductCard";
-import SuggestionPanel from "./components/SuggestionPanel";
-import { Product } from "./types/product";
-import mockProducts from "./data/products.json";
+import ProductCard from "../components/ProductCard";
+import SuggestionPanel from "../components/SuggestionPanel";
+import { Product } from "../types/product";
+import mockProducts from "../data/products.json";
+import Link from "next/link";
 
 const HomePage = () => {
   const [suggested, setSuggested] = useState<Product[]>([]);
@@ -29,7 +30,7 @@ const HomePage = () => {
         <SuggestionPanel products={suggested} />
 
         <div style={{ marginTop: "2rem" }}>
-          <a href="/catalog">Browse Full Catalog →</a>
+          <Link href="/catalog">Browse Full Catalog →</Link>
         </div>
       </main>
     </>
