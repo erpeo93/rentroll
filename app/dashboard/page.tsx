@@ -1,58 +1,45 @@
-"use client";
+import { cookies } from "next/headers";
+import { PrismaClient } from "@prisma/client";
 
-import React from "react";
-import ProductCard from "../../components/ProductCard";
-import { Product } from "../../types/product";
-import ReturnOptions from "../../components/ReturnOptions";
+const prisma = new PrismaClient();
 
-// TEMP: mock data for testing
-const mockHeldItems: Product[] = [
-  {
-    id: "p001",
-    name: "Catan",
-    category: "board game",
-    value: 35
-  },
-  {
-    id: "p004",
-    name: "Inception",
-    category: "film",
-    value: 18
+export default async function DashboardPage() {
+  const cookieStore = cookies();
+  const userId = cookieStore.get("userId")?.value;
+
+  if (!userId) {
+    return <p style={{ padding: "2rem" }}>🔒 You must be logged in to view this page.</p>;
   }
-];
 
-const DashboardPage = () => {
-  const heldValue = mockHeldItems.reduce((sum, item) => sum + item.value, 0);
-  const nextDelivery = "Monday, July 15 at 10:00 AM";
-  const balance = 4; // Delivery credits remaining
+  const user = await prisma.user.findUnique({
+    where: { id: userId },
+    include: { holdings: { include: { product: true } } }
+  });
+
+  if (!user) {
+    return <p>User not found.</p>;
+  }
+
+  const heldItems = user.holdings.map((h) => h.product);
+  const heldValue = heldItems.reduce((sum, p) => sum + p.value, 0);
 
   return (
     <main style={{ padding: "2rem" }}>
-      <h1>📦 Your Dashboard</h1>
+      <h1>📦 Welcome, {user.name}</h1>
 
-      <section style={{ marginTop: "2rem" }}>
-        <h2>🛒 Items You’re Holding</h2>
-        <div style={{ display: "flex", flexWrap: "wrap", gap: "1rem" }}>
-          {mockHeldItems.map((item) => (
-            <ProductCard key={item.id} product={item} />
-          ))}
-        </div>
-        <p style={{ marginTop: "1rem" }}>Total value held: <strong>${heldValue}</strong></p>
-      </section>
+      <h2>🛒 Your Items</h2>
+      <ul>
+        {heldItems.map((item) => (
+          <li key={item.id}>{item.name} (${item.value})</li>
+        ))}
+      </ul>
 
-      <section style={{ marginTop: "2rem" }}>
-        <h2>🚚 Next Delivery</h2>
-        <p>Scheduled for: <strong>{nextDelivery}</strong></p>
-      </section>
+      <p>Total value held: <strong>${heldValue}</strong></p>
+      <p>Balance: <strong>{user.balance}</strong> credits</p>
 
-      <section style={{ marginTop: "2rem" }}>
-        <h2>💳 Your Balance</h2>
-        <p>You have <strong>{balance}</strong> delivery credits remaining.</p>
-      </section>
-
-      <ReturnOptions />
+      <form method="POST" action="/api/logout" style={{ marginTop: "2rem" }}>
+      <button type="submit">🚪 Log Out</button>
+      </form>
     </main>
   );
-};
-
-export default DashboardPage;
+}
