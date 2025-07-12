@@ -9,26 +9,112 @@ datasource db {
 
 model User {
   id        String   @id @default(uuid())
-  name      String
-  email     String   @unique
-  password  String
-  city      String
-  balance   Int      @default(0)
-  holdings  Holding[]
+  email     String?  @unique
+  phone     String?  @unique
+  createdAt DateTime @default(now())
+  intents   Intent[]
+  products  Product[]          @relation("OwnedProducts")
+  instances ProductInstance[]  @relation("OwnedInstances")
+  orders    Order[]
 }
 
 model Product {
-  id       String   @id @default(uuid())
-  name     String
-  category String
-  value    Int
-  holdings Holding[]
+  id           String   @id @default(uuid())
+  name         String
+  value        Int
+  imageUrl     String?
+  variants     Json?
+  ownerUserId  String?      // for trade-ins
+  ownerUser    User?        @relation("OwnedProducts", fields: [ownerUserId], references: [id])
+  instances    ProductInstance[]
+  categoryId   String
+  category     ProductCategory @relation(fields: [categoryId], references: [id])
+  orders    Order[]
 }
 
-model Holding {
-  id        String   @id @default(uuid())
-  userId    String
-  productId String
-  user      User     @relation(fields: [userId], references: [id])
-  product   Product  @relation(fields: [productId], references: [id])
+model ProductInstance {
+  id         String   @id @default(uuid())
+  productId  String
+  product    Product  @relation(fields: [productId], references: [id])
+  ownerId    String?  // null = RentRoll owns it
+  owner      User?    @relation("OwnedInstances", fields: [ownerId], references: [id])
+  status     String   // e.g. "available", "rented", "in_review", etc.
+}
+
+model Intent {
+  id         String   @id @default(uuid())
+  userId     String?
+  user       User?    @relation(fields: [userId], references: [id])
+  city       String?
+  address    String?
+  deliveryWindow DateTime?
+  latitude   Float?
+  longitude  Float?
+  productId  String
+  variant    String?
+  status     String
+  confirmationToken String?
+  createdAt  DateTime @default(now())
+}
+
+model ProductRequest {
+  id          String   @id @default(uuid())
+  name        String
+  category    String
+  language    String
+  isUpcoming  Boolean  @default(false)
+  notes       String?
+  email       String?
+  createdAt   DateTime @default(now())
+}
+
+model AnalyticsEvent {
+  id         String   @id @default(uuid())
+  type       String
+  step       Int?
+  productId  String?
+  createdAt  DateTime @default(now())
+}
+
+model City {
+  id     String @id @default(uuid())
+  name   String
+  zones  Zone[]
+}
+
+model Zone {
+  id       String @id @default(uuid())
+  name     String
+  cityId   String
+  city     City   @relation(fields: [cityId], references: [id])
+  polygon  Json?  // geo boundaries from Google Maps or drawn manually
+  deliverySlots DeliverySlot[]
+}
+
+model DeliverySlot {
+  id       String   @id @default(uuid())
+  zoneId   String
+  zone     Zone     @relation(fields: [zoneId], references: [id])
+  start    DateTime
+  end      DateTime
+  isBooked Boolean  @default(false)
+}
+
+model ProductCategory {
+  id    String @id @default(uuid())
+  slug  String @unique  // e.g. "board-game"
+  name  String          // "Board Game" — always stored in English
+  products Product[]
+}
+
+model Order {
+  id          String   @id @default(uuid())
+  userId      String?             // optional for now
+  user        User?    @relation(fields: [userId], references: [id])
+  productId   String
+  product     Product  @relation(fields: [productId], references: [id])
+  variant     String?
+  createdAt   DateTime @default(now())
+  deliveryDate DateTime?
+  status      String   // e.g. "requested", "scheduled", "delivered"
 }

@@ -1,0 +1,31 @@
+{
+  "hero_title": "Noleggia giochi, film e libri",
+  "hero_subtitle": "Paghi solo la consegna — restituisci con il prossimo ordine",
+  "button_start": "Inizia a sfogliare",
+  "search_title": "Esplora tutti i prodotti",
+  "variant_label": "Seleziona una versione",
+  "step_delivery": "Dati di consegna",
+  "step_confirm": "Conferma ordine",
+  "step_thankyou": "Grazie! Ti avviseremo quando lanceremo nella tua zona.",
+  "not_available": "Servizio non disponibile nella tua zona 😔",
+  "hot_products": "Più richiesti",
+  "faq": [
+    {
+      "q": "Cosa pago?",
+      "a": "Solo la consegna. Restituisci i prodotti con l’ordine successivo."
+    },
+    {
+      "q": "Quanto tempo posso tenere un prodotto?",
+      "a": "Quanto vuoi — basta che il tuo saldo sia attivo."
+    },
+    {
+      "q": "Cosa succede se perdo un prodotto?",
+      "a": "Ti addebitiamo solo se non lo restituisci — il valore preautorizzato copre eventuali perdite."
+    }
+  ],
+"category_board-game": "Gioco da Tavolo",
+"category_video-game": "Videogioco",
+"category_book": "Libro",
+"category_film": "Film"
+}
+
