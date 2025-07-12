@@ -1,0 +1,5 @@
+[
+  { "q": "What do I pay for?", "a": "Only for delivery. You return items with your next order." },
+  { "q": "How long can I keep a product?", "a": "As long as your balance is active." },
+  { "q": "What if I lose a product?", "a": "We’ll use your pre-authorized balance to cover it." }
+]

@@ -1,0 +1,5 @@
+[
+  { "q": "Cosa pago?", "a": "Solo la consegna. Restituisci con l’ordine successivo." },
+  { "q": "Quanto posso tenere un prodotto?", "a": "Finché il saldo è attivo." },
+  { "q": "E se perdo un prodotto?", "a": "Useremo il tuo saldo preautorizzato." }
+]

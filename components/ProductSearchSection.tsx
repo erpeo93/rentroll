@@ -1,8 +1,8 @@
 'use client';
 
 import { useTranslation } from '../lib/i18n';
-import CheckoutModal from './Modal/CheckoutModal';
-import RequestProductModal from './Modal/RequestProductModal';
+import CheckoutModal from './modal/CheckoutModal';
+import RequestProductModal from './modal/RequestProductModal';
 import { useEffect, useState } from 'react';
 
 export default function ProductSearchSection() {
@@ -40,7 +40,7 @@ useEffect(() => {
       setProducts(data);
 
       // Live suggestions (names only)
-      const uniqueNames = Array.from(new Set(data.map((p: any) => p.name)));
+      const uniqueNames = Array.from(new Set(data.map((p: any) => p.name))) as string[];
       setSuggestions(uniqueNames.slice(0, 5));
     });
 

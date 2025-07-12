@@ -9,20 +9,6 @@
   "step_thankyou": "Grazie! Ti avviseremo quando lanceremo nella tua zona.",
   "not_available": "Servizio non disponibile nella tua zona 😔",
   "hot_products": "Più richiesti",
-  "faq": [
-    {
-      "q": "Cosa pago?",
-      "a": "Solo la consegna. Restituisci i prodotti con l’ordine successivo."
-    },
-    {
-      "q": "Quanto tempo posso tenere un prodotto?",
-      "a": "Quanto vuoi — basta che il tuo saldo sia attivo."
-    },
-    {
-      "q": "Cosa succede se perdo un prodotto?",
-      "a": "Ti addebitiamo solo se non lo restituisci — il valore preautorizzato copre eventuali perdite."
-    }
-  ],
 "category_board-game": "Gioco da Tavolo",
 "category_video-game": "Videogioco",
 "category_book": "Libro",

@@ -2,13 +2,13 @@
 
 import { useState, useEffect } from 'react';
 import { useTranslation } from '../lib/i18n';
-import CheckoutModal from './Modal/CheckoutModal';
+import CheckoutModal from './modal/CheckoutModal';
 
 
 export default function ProductCarousel() {
   const { t } = useTranslation();
   const [selectedProductId, setSelectedProductId] = useState<string | null>(null);
-  const [products, setProducts] = useState([]);
+  const [products, setProducts] = useState<any[]>([]);
 
   useEffect(() => {
     fetch('/api/products/hot')

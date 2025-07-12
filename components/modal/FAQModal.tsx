@@ -2,10 +2,13 @@
 
 import { useEffect } from 'react';
 import { useTranslation } from '../../lib/i18n';
+import faqEn from '../../i18n/faq.en.json';
+import faqIt from '../../i18n/faq.it.json';
 
 export default function FAQModal({ onClose }: { onClose: () => void }) {
   const { t } = useTranslation();
-  const faq = t("faq") as { q: string; a: string }[];
+const lang = typeof window !== 'undefined' && navigator.language.startsWith('it') ? 'it' : 'en';
+const faq = lang === 'it' ? faqIt : faqEn;
 
   useEffect(() => {
     document.body.style.overflow = 'hidden';
