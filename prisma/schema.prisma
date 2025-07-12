@@ -18,6 +18,18 @@ model User {
   orders    Order[]
 }
 
+model Order {
+  id          String   @id @default(uuid())
+  userId      String?             // optional for now
+  user        User?    @relation(fields: [userId], references: [id])
+  productId   String
+  product     Product  @relation(fields: [productId], references: [id])
+  variant     String?
+  createdAt   DateTime @default(now())
+  deliveryDate DateTime?
+  status      String   // e.g. "requested", "scheduled", "delivered"
+}
+
 model Product {
   id           String   @id @default(uuid())
   name         String
@@ -55,6 +67,7 @@ model Intent {
   status     String
   confirmationToken String?
   createdAt  DateTime @default(now())
+  consumables        IntentConsumable[]
 }
 
 model ProductRequest {
@@ -107,14 +120,20 @@ model ProductCategory {
   products Product[]
 }
 
-model Order {
-  id          String   @id @default(uuid())
-  userId      String?             // optional for now
-  user        User?    @relation(fields: [userId], references: [id])
-  productId   String
-  product     Product  @relation(fields: [productId], references: [id])
-  variant     String?
-  createdAt   DateTime @default(now())
-  deliveryDate DateTime?
-  status      String   // e.g. "requested", "scheduled", "delivered"
+model Consumable {
+  id        String      @id @default(uuid())
+  name        String
+  description String
+  image       String?
+  language    String    // 'en' or 'it'
+  createdAt   DateTime  @default(now())
+  intents     IntentConsumable[]
+}
+
+model IntentConsumable {
+  id            String      @id @default(uuid())
+  intent        Intent      @relation(fields: [intentId], references: [id])
+  intentId      String
+  consumable    Consumable  @relation(fields: [consumableId], references: [id])
+  consumableId  String
 }

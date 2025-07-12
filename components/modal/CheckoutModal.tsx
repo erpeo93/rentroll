@@ -1,12 +1,64 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 
 type Props = {
   productId: string;
   onClose: () => void;
 };
+
+type Consumable = {
+  id: string;
+  name: string;
+  description: string;
+  image?: string;
+  language: string;
+};
+
+function ExtrasStep({
+  consumables,
+  selectedIds,
+  onChange,
+  onNext,
+}: {
+  consumables: Consumable[];
+  selectedIds: String[];
+  onChange: (ids: String[]) => void;
+  onNext: () => void;
+}) {
+  const toggle = (id: string) => {
+    onChange(
+      selectedIds.includes(id)
+        ? selectedIds.filter(x => x !== id)
+        : [...selectedIds, id]
+    );
+  };
+
+  return (
+    <div className="space-y-4">
+      <h2 className="text-xl font-semibold">Would you like to add snacks or boosters?</h2>
+      <ul className="grid gap-2">
+        {consumables.map((c) => (
+          <li
+            key={c.id}
+            onClick={() => toggle(c.id)}
+            className={`p-4 border rounded-lg cursor-pointer ${
+              selectedIds.includes(c.id) ? 'border-blue-500 bg-blue-50' : 'border-gray-300'
+            }`}
+          >
+            <p className="font-medium">{c.name}</p>
+            <p className="text-sm text-gray-600">{c.description}</p>
+          </li>
+        ))}
+      </ul>
+
+      <button onClick={onNext} className="mt-4 px-4 py-2 bg-blue-600 text-white rounded">
+        Continue
+      </button>
+    </div>
+  );
+}
 
 export default function CheckoutModal({ productId, onClose }: Props) {
   const [step, setStep] = useState(1);
@@ -17,12 +69,23 @@ export default function CheckoutModal({ productId, onClose }: Props) {
   const [address, setAddress] = useState("");
   const [submitted, setSubmitted] = useState(false);
   const [termsAccepted, setTermsAccepted] = useState(false);
+const [consumables, setConsumables] = useState<Consumable[]>([]);
+const [selectedConsumables, setSelectedConsumables] = useState<String[]>([]);
+
+useEffect(() => {
+  fetch('/api/consumables')
+    .then((res) => res.json())
+    .then((data: Consumable[]) => {
+      setConsumables(data);
+    })
+    .catch((err) => console.error('Failed to load consumables:', err));
+}, []);
 
   const submitOrder = async () => {
     const res = await fetch("/api/checkout", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email, name, city, address, productId, variant })
+      body: JSON.stringify({ email, name, city, address, productId, variant, consumables: selectedConsumables.map(c => c) })
     });
 
     if (res.ok) {
@@ -31,6 +94,8 @@ export default function CheckoutModal({ productId, onClose }: Props) {
       alert("Something went wrong.");
     }
   };
+
+console.log("selectedConsumables", selectedConsumables);
 
   return (
     <div style={{
@@ -99,11 +164,33 @@ export default function CheckoutModal({ productId, onClose }: Props) {
                 <button onClick={() => setStep(3)}>Next</button>
               </>
             )}
-	    {step === 3 && (
+            {step === 3 && (
+  <ExtrasStep
+    consumables={consumables}
+    selectedIds={selectedConsumables}
+    onChange={setSelectedConsumables}
+    onNext={() => setStep(4)}
+  />
+            )}
+	    {step === 4 && (
   <>
     <h2>Confirm Order</h2>
     <p><strong>Product:</strong> {productId}</p>
     <p><strong>Variant:</strong> {variant}</p>
+
+{selectedConsumables.length > 0 && (
+  <div className="mt-4">
+    <h3 className="text-lg font-medium">Extras selected:</h3>
+    <ul className="list-disc ml-6 mt-1 text-sm text-gray-700">
+      {consumables
+        .filter((c) => selectedConsumables.includes(c.id))
+        .map((c) => (
+          <li key={c.id}>{c.name}</li>
+        ))}
+    </ul>
+  </div>
+)}
+
     <p><strong>To:</strong> {name}, {email}, {address}, {city}</p>
 
     <div style={{ marginTop: "1rem" }}>
