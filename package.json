@@ -7,7 +7,7 @@
   "dev": "next dev",
   "build": "next build",
   "start": "next start",
-  "lint": "next lint"
+  "lint": "next lint",
   "seed:products": "node prisma/seed-products.js",
   "seed:orders": "node prisma/seed-orders.js"
   },
