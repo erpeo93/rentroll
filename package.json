@@ -4,6 +4,12 @@
   "private": true,
   "scripts": {
     "seed": "ts-node prisma/seed.ts"
+  "dev": "next dev",
+  "build": "next build",
+  "start": "next start",
+  "lint": "next lint"
+  "seed:products": "node prisma/seed-products.js",
+  "seed:orders": "node prisma/seed-orders.js"
   },
   "dependencies": {
     "@prisma/client": "^6.11.1",
@@ -23,10 +29,4 @@
     "ts-node": "^10.9.2",
     "typescript": "^5.8.3"
   },
-"scripts": {
-  "dev": "next dev",
-  "build": "next build",
-  "start": "next start",
-  "lint": "next lint"
-}
 }
