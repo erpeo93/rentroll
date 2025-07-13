@@ -145,6 +145,7 @@ useEffect(() => {
       {selectedProductId && (
         <CheckoutModal
           productId={selectedProductId}
+          mode="single"
           onClose={() => setSelectedProductId(null)}
         />
       )}
