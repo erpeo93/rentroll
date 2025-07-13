@@ -14,9 +14,10 @@ const [suggestions, setSuggestions] = useState<string[]>([]);
   const [selectedProductId, setSelectedProductId] = useState<string | null>(null);
 const [showRequestModal, setShowRequestModal] = useState(false);
 const [categories, setCategories] = useState<{ slug: string; name: string }[]>([]);
+const [activeType, setActiveType] = useState<'ENTERTAINMENT' | 'CONSUMABLE'>('ENTERTAINMENT');
 
 useEffect(() => {
-  fetch("/api/categories")
+  fetch("/api/categories?type=${activeType}")
     .then(res => res.json())
     .then(data => {
       setCategories(
@@ -26,12 +27,13 @@ useEffect(() => {
         }))
       );
     });
-}, [t]);
+}, [t, activeType]);
 
 useEffect(() => {
   const q = new URLSearchParams();
   if (search) q.set("name", search);
   if (category) q.set("category", category);
+ if (activeType) q.set("type", activeType);
 
   const url = `/api/products?${q.toString()}`;
   fetch(url)
@@ -44,10 +46,42 @@ useEffect(() => {
       setSuggestions(uniqueNames.slice(0, 5));
     });
 
-}, [search, category]);
+}, [search, category, activeType]);
 
   return (
     <section style={{ padding: "2rem" }}>
+
+
+<div style={{ display: "flex", justifyContent: "center", marginBottom: "1.5rem" }}>
+  <div style={{
+    display: "flex",
+    background: "#1a1a1a",
+    borderRadius: "9999px",
+    padding: "0.25rem",
+    border: "1px solid #333"
+  }}>
+    {["ENTERTAINMENT", "CONSUMABLE"].map((type) => (
+      <button
+        key={type}
+        onClick={() => setActiveType(type as any)}
+        style={{
+          padding: "0.5rem 1.25rem",
+          borderRadius: "9999px",
+          background: activeType === type ? "#fff" : "transparent",
+          color: activeType === type ? "#000" : "#ccc",
+          border: "none",
+          fontWeight: "bold",
+          cursor: "pointer",
+          transition: "all 0.2s ease"
+        }}
+      >
+        {type === "ENTERTAINMENT" ? "🎮 Entertainment" : "🍿 Consumables"}
+      </button>
+    ))}
+  </div>
+</div>
+
+
       <h2>{t("search_title")}</h2>
 
       <div style={{ marginBottom: "1rem" }}>
@@ -81,6 +115,7 @@ useEffect(() => {
   ))}
 </select>
       </div>
+
 
       <div style={{ display: "flex", flexWrap: "wrap", gap: "1rem" }}>
         {products.map((product) => (

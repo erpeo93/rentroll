@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from 'react';
 
-
 type Props = {
   productId: string;
   onClose: () => void;
@@ -69,23 +68,40 @@ export default function CheckoutModal({ productId, onClose }: Props) {
   const [address, setAddress] = useState("");
   const [submitted, setSubmitted] = useState(false);
   const [termsAccepted, setTermsAccepted] = useState(false);
-const [consumables, setConsumables] = useState<Consumable[]>([]);
-const [selectedConsumables, setSelectedConsumables] = useState<String[]>([]);
+  const [consumables, setConsumables] = useState<Consumable[]>([]);
+  const [selectedConsumables, setSelectedConsumables] = useState<String[]>([]);
 
-useEffect(() => {
-  fetch('/api/consumables')
-    .then((res) => res.json())
-    .then((data: Consumable[]) => {
-      setConsumables(data);
-    })
-    .catch((err) => console.error('Failed to load consumables:', err));
-}, []);
+  useEffect(() => {
+    // Preload consumables when component mounts
+    fetch('/api/products?type=CONSUMABLE')
+      .then(res => res.json())
+      .then(data => {
+        if (Array.isArray(data)) {
+          setConsumables(data);
+        }
+      });
+  }, []);
+
+  useEffect(() => {
+    // Auto-skip extras step if no consumables are available
+    if (step === 3 && consumables.length === 0) {
+      setStep(4);
+    }
+  }, [step, consumables]);
 
   const submitOrder = async () => {
     const res = await fetch("/api/checkout", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email, name, city, address, productId, variant, consumables: selectedConsumables.map(c => c) })
+      body: JSON.stringify({
+        email,
+        name,
+        city,
+        address,
+        productId,
+        variant,
+        consumables: selectedConsumables.map(c => c)
+      })
     });
 
     if (res.ok) {
@@ -94,8 +110,6 @@ useEffect(() => {
       alert("Something went wrong.");
     }
   };
-
-console.log("selectedConsumables", selectedConsumables);
 
   return (
     <div style={{
@@ -164,67 +178,69 @@ console.log("selectedConsumables", selectedConsumables);
                 <button onClick={() => setStep(3)}>Next</button>
               </>
             )}
+
             {step === 3 && (
-  <ExtrasStep
-    consumables={consumables}
-    selectedIds={selectedConsumables}
-    onChange={setSelectedConsumables}
-    onNext={() => setStep(4)}
-  />
+              <ExtrasStep
+                consumables={consumables}
+                selectedIds={selectedConsumables}
+                onChange={setSelectedConsumables}
+                onNext={() => setStep(4)}
+              />
             )}
-	    {step === 4 && (
-  <>
-    <h2>Confirm Order</h2>
-    <p><strong>Product:</strong> {productId}</p>
-    <p><strong>Variant:</strong> {variant}</p>
 
-{selectedConsumables.length > 0 && (
-  <div className="mt-4">
-    <h3 className="text-lg font-medium">Extras selected:</h3>
-    <ul className="list-disc ml-6 mt-1 text-sm text-gray-700">
-      {consumables
-        .filter((c) => selectedConsumables.includes(c.id))
-        .map((c) => (
-          <li key={c.id}>{c.name}</li>
-        ))}
-    </ul>
-  </div>
-)}
+            {step === 4 && (
+              <>
+                <h2>Confirm Order</h2>
+                <p><strong>Product:</strong> {productId}</p>
+                <p><strong>Variant:</strong> {variant}</p>
 
-    <p><strong>To:</strong> {name}, {email}, {address}, {city}</p>
+                {selectedConsumables.length > 0 && (
+                  <div className="mt-4">
+                    <h3 className="text-lg font-medium">Extras selected:</h3>
+                    <ul className="list-disc ml-6 mt-1 text-sm text-gray-700">
+                      {consumables
+                        .filter((c) => selectedConsumables.includes(c.id))
+                        .map((c) => (
+                          <li key={c.id}>{c.name}</li>
+                        ))}
+                    </ul>
+                  </div>
+                )}
 
-    <div style={{ marginTop: "1rem" }}>
-      <label style={{ display: "flex", alignItems: "center", fontSize: "0.9rem" }}>
-        <input
-          type="checkbox"
-          checked={termsAccepted}
-          onChange={(e) => setTermsAccepted(e.target.checked)}
-          style={{ marginRight: "0.5rem" }}
-        />
-        I accept the&nbsp;
-        <a
-          href="/terms"
-          target="_blank"
-          rel="noopener noreferrer"
-          style={{ color: "#0070f3", textDecoration: "underline" }}
-        >
-          Terms and Conditions
-        </a>
-      </label>
-    </div>
+                <p><strong>To:</strong> {name}, {email}, {address}, {city}</p>
 
-    <div style={{ marginTop: "1rem" }}>
-      <button onClick={() => setStep(2)}>Back</button>
-      <button
-        onClick={submitOrder}
-        disabled={!termsAccepted}
-        style={{ marginLeft: "1rem", opacity: termsAccepted ? 1 : 0.5 }}
-      >
-        Confirm
-      </button>
-    </div>
-  </>
-)}
+                <div style={{ marginTop: "1rem" }}>
+                  <label style={{ display: "flex", alignItems: "center", fontSize: "0.9rem" }}>
+                    <input
+                      type="checkbox"
+                      checked={termsAccepted}
+                      onChange={(e) => setTermsAccepted(e.target.checked)}
+                      style={{ marginRight: "0.5rem" }}
+                    />
+                    I accept the&nbsp;
+                    <a
+                      href="/terms"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      style={{ color: "#0070f3", textDecoration: "underline" }}
+                    >
+                      Terms and Conditions
+                    </a>
+                  </label>
+                </div>
+
+                <div style={{ marginTop: "1rem" }}>
+                  <button onClick={() => setStep(2)}>Back</button>
+                  <button
+                    onClick={submitOrder}
+                    disabled={!termsAccepted}
+                    style={{ marginLeft: "1rem", opacity: termsAccepted ? 1 : 0.5 }}
+                  >
+                    Confirm
+                  </button>
+                </div>
+              </>
+            )}
           </>
         )}
       </div>

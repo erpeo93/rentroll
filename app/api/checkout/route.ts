@@ -44,19 +44,30 @@ export async function POST(req: Request) {
   // Step 2: Generate confirmation token
   const confirmationToken = randomUUID();
 
+const allProductIds = [
+  productId,                      // the main product
+  ...((consumables as { id: string }[] | undefined) ?? []).map((c) => c.id),
+];
+
+await prisma.intentProduct.createMany({
+  data: allProductIds.map(pid => ({
+    intentId: intent.id,
+    productId: pid
+  }))
+});
+
   // Step 3: Create intent (order)
   const intent = await prisma.intent.create({
     data: {
       userId: user?.id,
       city,
       address,
-      productId,
       variant,
       status: "submitted",
       confirmationToken,
-      consumables: {
-        create: consumables.map((id: string) => ({
-          consumable: {
+      products: {
+        create: allProductIds.map((id: string) => ({
+          product: {
             connect: { id },
           },
         })),
@@ -64,13 +75,5 @@ export async function POST(req: Request) {
     },
   });
 
-if (consumables && Array.isArray(consumables)) {
-  await prisma.intentConsumable.createMany({
-    data: consumables.map((id: string) => ({
-      intentId: intent.id,
-      consumableId: id,
-    })),
-  });
-}
   return NextResponse.json({ success: true, intentId: intent.id });
 }

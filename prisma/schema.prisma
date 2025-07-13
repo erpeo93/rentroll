@@ -42,6 +42,7 @@ model Product {
   categoryId   String
   category     ProductCategory @relation(fields: [categoryId], references: [id])
   orders    Order[]
+  intentProducts IntentProduct[]  @relation("ProductToIntentProduct")
 }
 
 model ProductInstance {
@@ -62,12 +63,19 @@ model Intent {
   deliveryWindow DateTime?
   latitude   Float?
   longitude  Float?
-  productId  String
   variant    String?
   status     String
   confirmationToken String?
   createdAt  DateTime @default(now())
-  consumables        IntentConsumable[]
+  products        IntentProduct[]
+}
+
+model IntentProduct {
+  id         String   @id @default(uuid())
+  intentId   String
+  productId  String
+  intent     Intent   @relation(fields: [intentId], references: [id])
+  product    Product  @relation("ProductToIntentProduct", fields: [productId], references: [id])
 }
 
 model ProductRequest {
@@ -117,23 +125,11 @@ model ProductCategory {
   id    String @id @default(uuid())
   slug  String @unique  // e.g. "board-game"
   name  String          // "Board Game" — always stored in English
+  type     CategoryType @default(ENTERTAINMENT) // New field
   products Product[]
 }
 
-model Consumable {
-  id        String      @id @default(uuid())
-  name        String
-  description String
-  image       String?
-  language    String    // 'en' or 'it'
-  createdAt   DateTime  @default(now())
-  intents     IntentConsumable[]
-}
-
-model IntentConsumable {
-  id            String      @id @default(uuid())
-  intent        Intent      @relation(fields: [intentId], references: [id])
-  intentId      String
-  consumable    Consumable  @relation(fields: [consumableId], references: [id])
-  consumableId  String
+enum CategoryType {
+  ENTERTAINMENT
+  CONSUMABLE
 }
