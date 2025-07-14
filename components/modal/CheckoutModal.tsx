@@ -2,9 +2,12 @@
 
 import { useState, useEffect } from 'react';
 import { CartItem, useCart  } from '@/lib/cart-context';
+import { generateDeliverySlots, DeliverySlot } from '@/lib/delivery-slots';
 
 type Props = {
   productId?: string; // optional; if present = Buy Now, else = Cart
+ productType?: string;
+startStep?: number;
   onClose: () => void;
 };
 
@@ -21,6 +24,12 @@ type Consumable = {
   image?: string;
   language: string;
 };
+
+function isValidAddress(address: string): boolean {
+  const hasNumber = /\d/.test(address);
+  const hasWord = /[a-zA-Z]/.test(address);
+  return address.trim().length >= 10 && hasNumber && hasWord;
+}
 
 function ExtrasStep({
   consumables,
@@ -66,13 +75,12 @@ function ExtrasStep({
   );
 }
 
-export default function CheckoutModal({ productId, onClose }: Props) {
+export default function CheckoutModal({ productId, productType, startStep, onClose }: Props) {
 
   const isBuyNow = !!productId;
   const { items: cartItems, addItem, clearCart } = useCart();
+  const [product, setProduct] = useState<any>(null);
 
-
-  const [step, setStep] = useState(1);
   const [variant, setVariant] = useState('Standard');
   const [email, setEmail] = useState('');
   const [name, setName] = useState('');
@@ -82,6 +90,9 @@ export default function CheckoutModal({ productId, onClose }: Props) {
   const [termsAccepted, setTermsAccepted] = useState(false);
   const [consumables, setConsumables] = useState<Consumable[]>([]);
   const [selectedConsumables, setSelectedConsumables] = useState<string[]>([]);
+const [slots, setSlots] = useState<DeliverySlot[]>([]);
+const [selectedSlot, setSelectedSlot] = useState<DeliverySlot | null>(null);
+const [step, setStep] = useState(startStep ?? 1);
 
   useEffect(() => {
     fetch('/api/products?type=CONSUMABLE')
@@ -97,6 +108,12 @@ export default function CheckoutModal({ productId, onClose }: Props) {
     }
   }, [step, consumables]);
 
+useEffect(() => {
+  const s = generateDeliverySlots();
+  setSlots(s);
+  setSelectedSlot(s[0] ?? null); // earliest available
+}, []);
+
   const handleBuyNow = () => {
     setStep(2);
   };
@@ -107,6 +124,10 @@ export default function CheckoutModal({ productId, onClose }: Props) {
     }
     onClose();
   };
+
+  const productInCart =
+    productType === 'ENTERTAINMENT' &&
+    cartItems.some((item) => item.id === productId);
 
   const submitOrder = async () => {
     const payload = {
@@ -209,18 +230,30 @@ export default function CheckoutModal({ productId, onClose }: Props) {
                       <option value="Deluxe">Deluxe</option>
                       <option value="Italian Edition">Italian Edition</option>
                     </select>
+{cartItems.length === 0 ? (
                     <button
                       className="w-full bg-blue-600 text-white py-2 px-4 rounded mb-2"
                       onClick={handleBuyNow}
                     >
                       Buy Now
                     </button>
+) : (null)}
+
+{productInCart ? (
+  <button
+    className="bg-gray-400 text-white px-4 py-2 rounded"
+    onClick={onClose}
+  >
+    Item already in your cart! Go back shopping
+  </button>
+) : (
                     <button
                       className="w-full border border-gray-400 py-2 px-4 rounded"
                       onClick={handleAddToCart}
                     >
                       Add to Cart & Continue Shopping
                     </button>
+)}
                   </>
                 )}
               </>
@@ -233,7 +266,42 @@ export default function CheckoutModal({ productId, onClose }: Props) {
                 <input className="w-full mb-2 border rounded px-2 py-1" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} />
                 <input className="w-full mb-2 border rounded px-2 py-1" placeholder="City" value={city} onChange={(e) => setCity(e.target.value)} />
                 <input className="w-full mb-4 border rounded px-2 py-1" placeholder="Address" value={address} onChange={(e) => setAddress(e.target.value)} />
-                <button onClick={() => setStep(3)} className="w-full px-4 py-2 bg-blue-600 text-white rounded">
+{isValidAddress(address) && (
+  <div className="mb-4">
+    <label className="block font-semibold mb-2">Choose a Delivery Slot</label>
+    <select
+      value={selectedSlot?.date}
+      onChange={(e) => {
+        const newDate = e.target.value;
+        const firstTime = slots.find((s) => s.date === newDate);
+        if (firstTime) setSelectedSlot(firstTime);
+      }}
+      className="mb-2 p-2 border rounded w-full"
+    >
+      {[...new Set(slots.map(s => s.date))].map(date => (
+        <option key={date} value={date}>{date}</option>
+      ))}
+    </select>
+
+    <select
+      value={selectedSlot?.time}
+      onChange={(e) => {
+        const newSlot = slots.find(
+          (s) => s.date === selectedSlot?.date && s.time === e.target.value
+        );
+        if (newSlot) setSelectedSlot(newSlot);
+      }}
+      className="p-2 border rounded w-full"
+    >
+      {slots
+        .filter(s => s.date === selectedSlot?.date)
+        .map(s => (
+          <option key={s.time} value={s.time}>{s.time}</option>
+        ))}
+    </select>
+  </div>                
+)}
+<button onClick={() => setStep(3)} className="w-full px-4 py-2 bg-blue-600 text-white rounded">
                   Next
                 </button>
               </>

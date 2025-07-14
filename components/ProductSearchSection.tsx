@@ -12,7 +12,7 @@ export default function ProductSearchSection() {
   const [category, setCategory] = useState('');
 const [products, setProducts] = useState<any[]>([]);
 const [suggestions, setSuggestions] = useState<string[]>([]);
-  const [selectedProductId, setSelectedProductId] = useState<string | null>(null);
+const [selectedProduct, setSelectedProduct] = useState<{ id: string; type: string } | null>(null);
 const [showRequestModal, setShowRequestModal] = useState(false);
 const [categories, setCategories] = useState<{ slug: string; name: string }[]>([]);
 const [activeType, setActiveType] = useState<'ENTERTAINMENT' | 'CONSUMABLE'>('ENTERTAINMENT');
@@ -140,7 +140,7 @@ useEffect(() => {
         {products.map((product) => (
           <div
             key={product.id}
-            onClick={() => setSelectedProductId(product.id)}
+            onClick={() => setSelectedProduct({ id: product.id, type: product.category?.type || 'ENTERTAINMENT' })}
             style={{
               border: "1px solid #ccc",
               borderRadius: "8px",
@@ -161,10 +161,11 @@ useEffect(() => {
   <button onClick={() => setShowRequestModal(true)}>Request a Product</button>
 </div>
 
-      {selectedProductId && (
+      {selectedProduct && (
         <CheckoutModal
-          productId={selectedProductId}
-          onClose={() => setSelectedProductId(null)}
+          productId={selectedProduct.id}
+	productType={selectedProduct.type}
+          onClose={() => setSelectedProduct(null)}
         />
       )}
 
