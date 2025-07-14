@@ -142,6 +142,9 @@ useEffect(() => {
     product &&
     cartItems.some((item) => item.id === product.id);
 
+const isSupportedCity = ['Rome', 'Milan', 'Florence'].includes(city);
+const isAddressValidAndUnsupported = isValidAddress(address) && !isSupportedCity;
+
   const submitOrder = async () => {
     const payload = {
       email,
@@ -309,6 +312,7 @@ style={{
                 <input className="w-full mb-2 border rounded px-2 py-1" placeholder="City" value={city} onChange={(e) => setCity(e.target.value)} />
                 <input className="w-full mb-4 border rounded px-2 py-1" placeholder="Address" value={address} onChange={(e) => setAddress(e.target.value)} />
 {isValidAddress(address) && (
+isSupportedCity ? (
   <div className="mb-4">
     <label className="block font-semibold mb-2">Choose a Delivery Slot</label>
     <select
@@ -341,10 +345,22 @@ style={{
           <option key={s.time} value={s.time}>{s.time}</option>
         ))}
     </select>
-  </div>                
+  </div>  
+) : (
+    <div className="text-center">
+      <p>Sorry, our service isn't available in your city yet.</p>
+    </div>
+)              
 )}
-<button onClick={() => setStep(3)} disabled={!isValidEmail(email) || !isValidAddress(address)} className="w-full px-4 py-2 bg-blue-600 text-white rounded">
-                  Next
+<button onClick={() => {
+    if (isAddressValidAndUnsupported) {
+      //router.push('/help-us-improve');
+    } else {
+      setStep(3);
+    }
+	}
+} disabled={!isValidEmail(email) || !isValidAddress(address)} className="w-full px-4 py-2 bg-blue-600 text-white rounded">
+                  {isAddressValidAndUnsupported ? 'Help us Improve' : 'Next'}
                 </button>
               </>
             )}
