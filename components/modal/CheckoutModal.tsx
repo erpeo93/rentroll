@@ -3,11 +3,18 @@
 import { useState, useEffect } from 'react';
 import { CartItem, useCart  } from '@/lib/cart-context';
 import { generateDeliverySlots, DeliverySlot } from '@/lib/delivery-slots';
+import { useTranslation } from '@/lib/i18n';
 
 type Props = {
-  productId?: string; // optional; if present = Buy Now, else = Cart
- productType?: string;
-startStep?: number;
+  product?: {
+    id: string;
+    name: string;
+    imageUrl: string;
+    description?: string;
+    category?: { name: string };
+  };
+  productType?: string;
+  startStep?: number;
   onClose: () => void;
 };
 
@@ -79,11 +86,11 @@ function ExtrasStep({
   );
 }
 
-export default function CheckoutModal({ productId, productType, startStep, onClose }: Props) {
+export default function CheckoutModal({ product, productType, startStep, onClose }: Props) {
 
-  const isBuyNow = !!productId;
+  const isBuyNow = !!product;
   const { items: cartItems, addItem, clearCart } = useCart();
-  const [product, setProduct] = useState<any>(null);
+const { t } = useTranslation();
 
   const [variant, setVariant] = useState('Standard');
   const [email, setEmail] = useState('');
@@ -124,15 +131,16 @@ useEffect(() => {
   };
 
   const handleAddToCart = () => {
-    if (productId) {
-      addItem({ id: productId, name: productId, variant });
+    if (product) {
+      addItem({ id: product.id, name: product.name, variant });
     }
     onClose();
   };
 
   const productInCart =
     productType === 'ENTERTAINMENT' &&
-    cartItems.some((item) => item.id === productId);
+    product &&
+    cartItems.some((item) => item.id === product.id);
 
   const submitOrder = async () => {
     const payload = {
@@ -142,7 +150,7 @@ useEffect(() => {
       address,
       variant,
       consumables: selectedConsumables,
-      productIds: !isBuyNow ? cartItems.map((p) => p.id) : [productId],
+      productIds: !isBuyNow ? cartItems.map((p) => p.id) : [product.id],
     };
 
     const res = await fetch('/api/checkout', {
@@ -229,16 +237,32 @@ style={{
                   </>
                 ) : (
                   <>
-                    <h2>Select Variant</h2>
-                    <select
-                      className="w-full mt-2 mb-4 border rounded px-2 py-1"
-                      value={variant}
-                      onChange={(e) => setVariant(e.target.value)}
-                    >
-                      <option value="Standard">Standard</option>
-                      <option value="Deluxe">Deluxe</option>
-                      <option value="Italian Edition">Italian Edition</option>
-                    </select>
+{product ? (
+  <div className="flex flex-col items-center gap-6">
+    <img
+      src={product.imageUrl}
+      alt={product.name}
+      className="w-full max-w-sm rounded-xl shadow-md object-contain"
+    />
+
+    <div className="text-center space-y-2">
+      <h2 className="text-2xl font-semibold">{product.name}</h2>
+      {product.category?.name && (
+        <p className="text-sm uppercase text-gray-500 tracking-wide">
+          {product.category.name}
+        </p>
+      )}
+      {product.description && (
+        <p className="text-gray-700 text-base max-w-md mx-auto leading-relaxed whitespace-pre-line">
+          {product.description}
+        </p>
+      )}
+    </div>
+  </div>
+) : (
+  <p>Loading product details...</p>
+)}
+
 {cartItems.length === 0 ? (
                     <button
                       className="w-full bg-blue-600 text-white py-2 px-4 rounded mb-2"
@@ -347,7 +371,7 @@ style={{
                     ))}
                   </ul>
                 ) : (
-                  <p className="mt-2"><strong>Product:</strong> {productId} ({variant})</p>
+                  <p className="mt-2"><strong>Product:</strong> {product.id} ({variant})</p>
                 )}
 
                 {selectedConsumables.length > 0 && (

@@ -7,8 +7,8 @@ import CheckoutModal from './modal/CheckoutModal';
 
 export default function ProductCarousel() {
   const { t } = useTranslation();
-const [selectedProduct, setSelectedProduct] = useState<{ id: string; type: string } | null>(null);
   const [products, setProducts] = useState<any[]>([]);
+const [selectedProduct, setSelectedProduct] = useState<any | null>(null);
 
   useEffect(() => {
     fetch('/api/products/hot')
@@ -36,20 +36,20 @@ const [selectedProduct, setSelectedProduct] = useState<{ id: string; type: strin
               background: "#fff",
               cursor: "pointer"
             }}
-            onClick={() => setSelectedProduct({ id: product.id, type: product.category?.type })}
+            onClick={() => setSelectedProduct(product)}
           >
             <h3>{product.name}</h3>
           </div>
         ))}
       </div>
 
-      {selectedProduct && (
-        <CheckoutModal
-          productId={selectedProduct.id}
-	productType={selectedProduct.type}
-          onClose={() => setSelectedProduct(null)}
-        />
-      )}
+{selectedProduct && (
+  <CheckoutModal
+    product={selectedProduct}
+    productType={selectedProduct.category?.type || 'ENTERTAINMENT'}
+    onClose={() => setSelectedProduct(null)}
+  />
+)}
     </section>
   );
 }

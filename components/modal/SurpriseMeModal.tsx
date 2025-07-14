@@ -234,7 +234,7 @@ export default function SurpriseMeModal({ onClose }: { onClose: () => void }) {
 
         {showCheckout && suggestedProduct && (
           <CheckoutModal
-            productId={suggestedProduct.id}
+            product={suggestedProduct}
             onClose={() => {
               setShowCheckout(false);
               onClose();

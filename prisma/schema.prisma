@@ -35,6 +35,7 @@ model Product {
   name         String
   value        Int
   imageUrl     String?
+  description  String?
   variants     Json?
   ownerUserId  String?      // for trade-ins
   ownerUser    User?        @relation("OwnedProducts", fields: [ownerUserId], references: [id])

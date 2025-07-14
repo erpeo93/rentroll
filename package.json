@@ -3,14 +3,13 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "lint": "eslint . --ext .ts,.tsx",
+    "lint": "next lint",
     "lint:fix": "eslint . --ext .ts,.tsx --fix",
     "typecheck": "tsc --noEmit",
     "seed": "ts-node prisma/seed.ts",
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint",
     "seed:products": "node prisma/seed-products.js",
     "seed:orders": "node prisma/seed-orders.js",
     "watch:build": "onchange '**/*.ts' '**/*.tsx' -- npm run check",
@@ -21,7 +20,8 @@
     "bcrypt": "^6.0.0",
     "next": "15.3.5",
     "react": "^19.0.0",
-    "react-dom": "^19.0.0"
+    "react-dom": "^19.0.0",
+    "uuid": "^11.1.0"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
