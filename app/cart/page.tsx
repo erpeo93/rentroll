@@ -51,8 +51,6 @@ export default function CartPage() {
 
       {checkoutOpen && (
         <CheckoutModal
-          mode="cart"
-          cartItems={items}
           onClose={() => setCheckoutOpen(false)}
         />
       )}

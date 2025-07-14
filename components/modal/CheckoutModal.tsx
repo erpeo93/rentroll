@@ -1,10 +1,10 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useCart } from '@/lib/cart-context';
+import { CartItem, useCart  } from '@/lib/cart-context';
 
 type Props = {
-  productId?: string; // if undefined, modal is in cart mode
+  productId?: string; // optional; if present = Buy Now, else = Cart
   onClose: () => void;
 };
 
@@ -67,8 +67,10 @@ function ExtrasStep({
 }
 
 export default function CheckoutModal({ productId, onClose }: Props) {
-  const isCartMode = !productId;
+
+  const isBuyNow = !!productId;
   const { items: cartItems, addItem, clearCart } = useCart();
+
 
   const [step, setStep] = useState(1);
   const [variant, setVariant] = useState('Standard');
@@ -114,7 +116,7 @@ export default function CheckoutModal({ productId, onClose }: Props) {
       address,
       variant,
       consumables: selectedConsumables,
-      productIds: isCartMode ? cartItems.map((p) => p.id) : [productId],
+      productIds: !isBuyNow ? cartItems.map((p) => p.id) : [productId],
     };
 
     const res = await fetch('/api/checkout', {
@@ -178,7 +180,7 @@ export default function CheckoutModal({ productId, onClose }: Props) {
           <>
             {step === 1 && (
               <>
-                {isCartMode ? (
+                {!isBuyNow ? (
                   <>
                     <h2 className="text-xl font-semibold mb-2">Cart Recap</h2>
                     <ul className="mb-4">
@@ -250,7 +252,7 @@ export default function CheckoutModal({ productId, onClose }: Props) {
               <>
                 <h2>Confirm Order</h2>
 
-                {isCartMode ? (
+                {!isBuyNow ? (
                   <ul className="mt-2 text-sm">
                     {cartItems.map((item) => (
                       <li key={item.id}>

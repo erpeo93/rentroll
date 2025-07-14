@@ -46,7 +46,6 @@ export default function ProductCarousel() {
       {selectedProductId && (
         <CheckoutModal
           productId={selectedProductId}
-          mode="single"
           onClose={() => setSelectedProductId(null)}
         />
       )}

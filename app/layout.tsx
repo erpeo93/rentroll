@@ -3,17 +3,39 @@
 import './globals.css';
 import { ReactNode, useState } from 'react';
 import { I18nProvider } from '../lib/i18n';
-import { CartProvider } from '@/lib/cart-context';
+import { CartProvider, useCart } from '@/lib/cart-context';
 import CheckoutModal from '@/components/modal/CheckoutModal';
+import FloatingCartButton from '@/components/FloatingCartButton';
+
+function LayoutWithCart({ children }: { children: ReactNode }) {
+  const [isCheckoutOpen, setCheckoutOpen] = useState(false);
+  const { items: cartItems } = useCart();
+
+  return (
+    <>
+      {children}
+
+      {/* Show floating cart button if cart is not empty */}
+      {cartItems.length > 0 && (
+        <FloatingCartButton />
+      )}
+
+      {/* Show checkout modal in "cart" mode */}
+      {isCheckoutOpen && (
+        <CheckoutModal
+          onClose={() => setCheckoutOpen(false)}
+        />
+      )}
+    </>
+  );
+}
 
 export default function RootLayout({ children }: { children: ReactNode }) {
-  const [isCheckoutOpen, setCheckoutOpen] = useState(false);
-
-  const lang = typeof window !== 'undefined'
-    ? new URLSearchParams(window.location.search).get('lang') === 'it'
-      ? 'it'
-      : 'en'
-    : 'en';
+  // determine language from search param
+  const langParam = typeof window !== 'undefined'
+    ? new URLSearchParams(window.location.search).get('lang')
+    : null;
+  const lang = langParam === 'it' ? 'it' : 'en';
 
   return (
     <html lang={lang}>
@@ -21,18 +43,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
       <body>
         <CartProvider>
           <I18nProvider lang={lang}>
-            <button
-              onClick={() => setCheckoutOpen(true)}
-              className="fixed bottom-6 right-6 bg-blue-600 text-white px-4 py-2 rounded-full shadow-md z-50"
-            >
-              Cart
-            </button>
-
-            {isCheckoutOpen && (
-              <CheckoutModal onClose={() => setCheckoutOpen(false)} />
-            )}
-
-            {children}
+            <LayoutWithCart>{children}</LayoutWithCart>
           </I18nProvider>
         </CartProvider>
       </body>
