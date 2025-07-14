@@ -5,186 +5,122 @@ import { useTranslation } from '@/lib/i18n';
 import { useCart } from '@/lib/cart-context';
 import CheckoutModal from './CheckoutModal';
 
-interface Question {
+type Question = {
   key: string;
   label: string;
-  options: { label: string; value: string }[];
   required: boolean;
-}
+  options: { label: string; value: string }[];
+};
 
 export default function SurpriseMeModal({ onClose }: { onClose: () => void }) {
   const { t } = useTranslation();
   const { addItem } = useCart();
 
   const [categories, setCategories] = useState<{ slug: string; name: string }[]>([]);
+  const [selectedCategory, setSelectedCategory] = useState('');
   const [formData, setFormData] = useState<Record<string, string>>({});
+  const [answered, setAnswered] = useState<Record<string, boolean>>({});
+  const [questionProgress, setQuestionProgress] = useState(1);
+
   const [suggestedProduct, setSuggestedProduct] = useState<any | null>(null);
   const [showCheckout, setShowCheckout] = useState(false);
-
-  const [selectedCategory, setSelectedCategory] = useState('');
-  const [visibleQuestions, setVisibleQuestions] = useState<Question[]>([]);
-  const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
-  const [allRequiredAnswered, setAllRequiredAnswered] = useState(false);
-
-const questionSets: Record<string, Question[]> = {
-  'board-game': [
-    {
-      key: 'players',
-      label: t('surprise_step_players'),
-      required: true,
-      options: [
-        { label: '1', value: '1' },
-        { label: '2', value: '2' },
-        { label: '3+', value: '3+' },
-      ],
-    },
-    {
-      key: 'mood',
-      label: t('surprise_step_mood'),
-      required: false,
-      options: [
-        { label: t('mood_chill'), value: 'chill' },
-        { label: t('mood_competitive'), value: 'competitive' },
-        { label: t('mood_funny'), value: 'funny' },
-      ],
-    },
-  ],
-
-  'video-game': [
-    {
-      key: 'players',
-      label: t('surprise_step_players'),
-      required: true,
-      options: [
-        { label: t('solo'), value: 'solo' },
-        { label: t('multiplayer'), value: 'multiplayer' },
-      ],
-    },
-    {
-      key: 'genre',
-      label: t('surprise_step_genre'),
-      required: true,
-      options: [
-        { label: t('genre_action'), value: 'action' },
-        { label: t('genre_strategy'), value: 'strategy' },
-        { label: t('genre_puzzle'), value: 'puzzle' },
-      ],
-    },
-    {
-      key: 'mood',
-      label: t('surprise_step_mood'),
-      required: false,
-      options: [
-        { label: t('mood_chill'), value: 'chill' },
-        { label: t('mood_competitive'), value: 'competitive' },
-        { label: t('mood_funny'), value: 'funny' },
-      ],
-    },
-  ],
-
-  'book': [
-    {
-      key: 'genre',
-      label: t('surprise_step_genre'),
-      required: true,
-      options: [
-        { label: t('genre_fantasy'), value: 'fantasy' },
-        { label: t('genre_thriller'), value: 'thriller' },
-        { label: t('genre_nonfiction'), value: 'nonfiction' },
-      ],
-    },
-    {
-      key: 'length',
-      label: t('surprise_step_length'),
-      required: false,
-      options: [
-        { label: t('length_short'), value: 'short' },
-        { label: t('length_medium'), value: 'medium' },
-        { label: t('length_long'), value: 'long' },
-      ],
-    },
-  ],
-
-  'film': [
-    {
-      key: 'genre',
-      label: t('surprise_step_genre'),
-      required: true,
-      options: [
-        { label: t('genre_comedy'), value: 'comedy' },
-        { label: t('genre_drama'), value: 'drama' },
-        { label: t('genre_horror'), value: 'horror' },
-      ],
-    },
-    {
-      key: 'length',
-      label: t('surprise_step_length'),
-      required: false,
-      options: [
-        { label: t('length_short'), value: 'short' },
-        { label: t('length_standard'), value: 'standard' },
-        { label: t('length_epic'), value: 'epic' },
-      ],
-    },
-    {
-      key: 'mood',
-      label: t('surprise_step_mood'),
-      required: false,
-      options: [
-        { label: t('mood_chill'), value: 'chill' },
-        { label: t('mood_competitive'), value: 'competitive' },
-        { label: t('mood_funny'), value: 'funny' },
-      ],
-    },
-  ],
-};
 
   useEffect(() => {
     fetch('/api/categories?type=ENTERTAINMENT')
       .then((res) => res.json())
       .then((data) => {
         setCategories(
-          data.map((c: any) => ({ slug: c.slug, name: t(`category_${c.slug}`) || c.name }))
+          data.map((c: any) => ({
+            slug: c.slug,
+            name: t(`category_${c.slug}`) || c.name,
+          }))
         );
       });
   }, [t]);
 
-  const handleCategorySelect = (value: string) => {
-    setSelectedCategory(value);
-    setFormData({});
-    setSuggestedProduct(null);
-    const set = questionSets[value];
-    setVisibleQuestions(set ? [set[0]] : []);
-    setCurrentQuestionIndex(0);
-    setAllRequiredAnswered(false);
+  const questionSets: Record<string, Question[]> = {
+    'board-game': [
+      {
+        key: 'players',
+        label: t('surprise_step_players'),
+        required: true,
+        options: ['1', '2', '3+'].map((v) => ({ label: v, value: v })),
+      },
+      {
+        key: 'mood',
+        label: t('surprise_step_mood'),
+        required: false,
+        options: [
+          { label: t('mood_chill'), value: 'chill' },
+          { label: t('mood_competitive'), value: 'competitive' },
+          { label: t('mood_funny'), value: 'funny' },
+        ],
+      },
+    ],
+    'video-game': [
+      {
+        key: 'platform',
+        label: t('surprise_step_platform'),
+        required: true,
+        options: ['PC', 'PlayStation', 'Xbox', 'Switch'].map((v) => ({
+          label: v,
+          value: v,
+        })),
+      },
+      {
+        key: 'mood',
+        label: t('surprise_step_mood'),
+        required: false,
+        options: [
+          { label: t('mood_chill'), value: 'chill' },
+          { label: t('mood_competitive'), value: 'competitive' },
+          { label: t('mood_funny'), value: 'funny' },
+        ],
+      },
+    ],
+    book: [
+      {
+        key: 'genre',
+        label: t('surprise_step_genre'),
+        required: true,
+        options: ['fiction', 'non-fiction', 'fantasy', 'mystery'].map((v) => ({
+          label: v,
+          value: v,
+        })),
+      },
+    ],
+    film: [
+      {
+        key: 'mood',
+        label: t('surprise_step_mood'),
+        required: true,
+        options: [
+          { label: t('mood_chill'), value: 'chill' },
+          { label: t('mood_funny'), value: 'funny' },
+          { label: t('mood_educational'), value: 'educational' },
+        ],
+      },
+    ],
   };
 
-  const handleAnswer = (key: string, value: string) => {
-    setFormData((prev) => {
-      const updated = { ...prev, [key]: value };
+  const handleChange = (field: string, value: string) => {
+    setFormData((prev) => ({ ...prev, [field]: value }));
+    setAnswered((prev) => ({ ...prev, [field]: true }));
 
-      const fullSet = questionSets[selectedCategory] || [];
-      const unansweredRequired = fullSet.filter(
-        (q) => q.required && !updated[q.key]
-      );
+    const questions = questionSets[selectedCategory] || [];
+    const currentIndex = questions.findIndex((q) => q.key === field);
+    const nextQuestionIndex = currentIndex + 1;
 
-      setAllRequiredAnswered(unansweredRequired.length === 0);
-
-      const nextIndex = currentQuestionIndex + 1;
-      if (nextIndex < fullSet.length && !visibleQuestions.includes(fullSet[nextIndex])) {
-        setVisibleQuestions(fullSet.slice(0, nextIndex + 1));
-        setCurrentQuestionIndex(nextIndex);
-      }
-
-      return updated;
-    });
+    if (nextQuestionIndex >= questionProgress && nextQuestionIndex < questions.length) {
+      setQuestionProgress(nextQuestionIndex + 1);
+    }
   };
 
   const handleSubmit = async () => {
     const params = new URLSearchParams({
       category: selectedCategory,
       type: 'ENTERTAINMENT',
-      ...formData
+      ...formData,
     });
 
     const res = await fetch(`/api/products?${params.toString()}`);
@@ -205,18 +141,24 @@ const questionSets: Record<string, Question[]> = {
       }}
       className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
     >
-      <div className="bg-white rounded-lg p-6 w-full max-w-md relative overflow-y-auto max-h-[90vh]">
-        <button className="absolute top-4 right-4 text-xl" onClick={onClose}>
+      <div className="bg-white rounded-lg p-6 w-full max-w-md relative max-h-[90vh] overflow-y-auto">
+        <button className="absolute top-4 right-4" onClick={onClose}>
           ✖
         </button>
 
-        {!selectedCategory && (
-          <div>
+        {!suggestedProduct && (
+          <>
             <h2 className="text-lg font-bold mb-2">{t('surprise_step_category')}</h2>
             <select
-              value=""
-              onChange={(e) => handleCategorySelect(e.target.value)}
-              className="w-full border p-2 rounded"
+              value={selectedCategory}
+              onChange={(e) => {
+                const newCat = e.target.value;
+                setSelectedCategory(newCat);
+                setFormData({});
+                setAnswered({});
+                setQuestionProgress(1);
+              }}
+              className="w-full border p-2 rounded mb-4"
             >
               <option value="">--</option>
               {categories.map((c) => (
@@ -225,38 +167,42 @@ const questionSets: Record<string, Question[]> = {
                 </option>
               ))}
             </select>
-          </div>
-        )}
 
-        {selectedCategory && !suggestedProduct && (
-          <div className="space-y-6">
-            {visibleQuestions.map((q) => (
-              <div key={q.key}>
-                <h2 className="text-lg font-bold mb-2">{q.label}</h2>
-                <select
-                  value={formData[q.key] || ''}
-                  onChange={(e) => handleAnswer(q.key, e.target.value)}
-                  className="w-full border p-2 rounded"
-                >
-                  <option value="">--</option>
-                  {q.options.map((opt) => (
-                    <option key={opt.value} value={opt.value}>
-                      {opt.label}
-                    </option>
+            {selectedCategory && questionSets[selectedCategory] && (
+              <>
+                {questionSets[selectedCategory]
+                  .slice(0, questionProgress)
+                  .map((q) => (
+                    <div key={q.key} className="mb-4">
+                      <label className="block font-semibold mb-1">{q.label}</label>
+                      <select
+                        value={formData[q.key] || ''}
+                        onChange={(e) => handleChange(q.key, e.target.value)}
+                        className="w-full border p-2 rounded"
+                      >
+                        <option value="">--</option>
+                        {q.options.map((opt) => (
+                          <option key={opt.value} value={opt.value}>
+                            {opt.label}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
                   ))}
-                </select>
-              </div>
-            ))}
 
-            {allRequiredAnswered && (
-              <button
-                onClick={handleSubmit}
-                className="w-full bg-green-600 text-white px-4 py-2 rounded"
-              >
-                {t('surprise_submit')}
-              </button>
+                {questionSets[selectedCategory].every(
+                  (q) => !q.required || answered[q.key]
+                ) && (
+                  <button
+                    onClick={handleSubmit}
+                    className="mt-2 bg-green-600 text-white px-4 py-2 rounded"
+                  >
+                    {t('surprise_submit')}
+                  </button>
+                )}
+              </>
             )}
-          </div>
+          </>
         )}
 
         {suggestedProduct && (
