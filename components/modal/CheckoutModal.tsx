@@ -31,6 +31,10 @@ function isValidAddress(address: string): boolean {
   return address.trim().length >= 10 && hasNumber && hasWord;
 }
 
+function isValidEmail(email: string): boolean {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+}
+
 function ExtrasStep({
   consumables,
   selectedIds,
@@ -93,6 +97,7 @@ export default function CheckoutModal({ productId, productType, startStep, onClo
 const [slots, setSlots] = useState<DeliverySlot[]>([]);
 const [selectedSlot, setSelectedSlot] = useState<DeliverySlot | null>(null);
 const [step, setStep] = useState(startStep ?? 1);
+const [emailTouched, setEmailTouched] = useState(false);
 
   useEffect(() => {
     fetch('/api/products?type=CONSUMABLE')
@@ -155,7 +160,11 @@ useEffect(() => {
   };
 
   return (
-    <div style={{
+    <div 
+  onClick={(e) => {
+    if (e.target === e.currentTarget) onClose();
+  }}
+style={{
       position: 'fixed',
       top: 0, left: 0,
       width: '100%',
@@ -263,7 +272,16 @@ useEffect(() => {
               <>
                 <h2>Delivery Info</h2>
                 <input className="w-full mt-2 mb-2 border rounded px-2 py-1" placeholder="Name" value={name} onChange={(e) => setName(e.target.value)} />
-                <input className="w-full mb-2 border rounded px-2 py-1" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} />
+<input
+  className="w-full mb-2 border rounded px-2 py-1"
+  placeholder="Email"
+  value={email}
+  onChange={(e) => setEmail(e.target.value)}
+  onBlur={() => setEmailTouched(true)}
+/>
+{emailTouched && !isValidEmail(email) && (
+  <p className="text-red-500 text-sm mb-2">Please enter a valid email address.</p>
+)}                
                 <input className="w-full mb-2 border rounded px-2 py-1" placeholder="City" value={city} onChange={(e) => setCity(e.target.value)} />
                 <input className="w-full mb-4 border rounded px-2 py-1" placeholder="Address" value={address} onChange={(e) => setAddress(e.target.value)} />
 {isValidAddress(address) && (
@@ -301,7 +319,7 @@ useEffect(() => {
     </select>
   </div>                
 )}
-<button onClick={() => setStep(3)} className="w-full px-4 py-2 bg-blue-600 text-white rounded">
+<button onClick={() => setStep(3)} disabled={!isValidEmail(email) || !isValidAddress(address)} className="w-full px-4 py-2 bg-blue-600 text-white rounded">
                   Next
                 </button>
               </>
