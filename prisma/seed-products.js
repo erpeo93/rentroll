@@ -18,6 +18,40 @@ async function main() {
     skipDuplicates: true
   });
 
+  await prisma.product.createMany({
+    data: [
+      {
+        name: 'Just One',
+        categoryId: boardGame.id,
+        minPlayers: 3,
+        maxPlayers: 7,
+        moodTags: ['cooperative', 'lighthearted']
+      },
+      {
+        name: 'The Mind',
+        categoryId: boardGame.id,
+        minPlayers: 2,
+        maxPlayers: 4,
+        moodTags: ['cooperative', 'intense']
+      },
+      {
+        name: 'Monikers',
+        categoryId: boardGame.id,
+        minPlayers: 4,
+        maxPlayers: 10,
+        moodTags: ['party', 'funny']
+      },
+      {
+        name: 'Azul',
+        categoryId: boardGame.id,
+        minPlayers: 2,
+        maxPlayers: 4,
+        moodTags: ['strategic', 'chill']
+      }
+    ],
+skipDuplicates: true
+  });
+
   console.log('✅ Seeded products');
 }
 

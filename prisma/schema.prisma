@@ -41,6 +41,9 @@ model Product {
   instances    ProductInstance[]
   categoryId   String
   category     ProductCategory @relation(fields: [categoryId], references: [id])
+  minPlayers  Int?
+  maxPlayers  Int?
+  moodTags    String[] // Postgres `text[]` type
   orders    Order[]
   intentProducts IntentProduct[]  @relation("ProductToIntentProduct")
 }

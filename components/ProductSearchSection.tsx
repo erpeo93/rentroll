@@ -4,6 +4,7 @@ import { useTranslation } from '../lib/i18n';
 import CheckoutModal from './modal/CheckoutModal';
 import RequestProductModal from './modal/RequestProductModal';
 import { useEffect, useState } from 'react';
+import SurpriseMeModal from './modal/SurpriseMeModal'; // adjust path if needed
 
 export default function ProductSearchSection() {
   const { t } = useTranslation();
@@ -15,6 +16,7 @@ const [suggestions, setSuggestions] = useState<string[]>([]);
 const [showRequestModal, setShowRequestModal] = useState(false);
 const [categories, setCategories] = useState<{ slug: string; name: string }[]>([]);
 const [activeType, setActiveType] = useState<'ENTERTAINMENT' | 'CONSUMABLE'>('ENTERTAINMENT');
+const [showSurpriseModal, setShowSurpriseModal] = useState(false);
 
 useEffect(() => {
   fetch(`/api/categories?type=${activeType}`)
@@ -85,6 +87,23 @@ useEffect(() => {
       <h2>{t("search_title")}</h2>
 
       <div style={{ marginBottom: "1rem" }}>
+{activeType === "ENTERTAINMENT" && (
+  <button
+    onClick={() => setShowSurpriseModal(true)}
+    style={{
+      marginTop: "1rem",
+      backgroundColor: "#4f46e5",
+      color: "white",
+      padding: "0.5rem 1rem",
+      borderRadius: "8px",
+      fontWeight: "bold",
+      cursor: "pointer",
+      border: "none"
+    }}
+  >
+    🎲 {t("surprise_me") || "Surprise Me!"}
+  </button>
+)}
         <input
           placeholder="Search by name"
           value={search}
@@ -151,6 +170,9 @@ useEffect(() => {
 
 {showRequestModal && (
   <RequestProductModal onClose={() => setShowRequestModal(false)} />
+)}
+{showSurpriseModal && (
+  <SurpriseMeModal onClose={() => setShowSurpriseModal(false)} />
 )}
     </section>
   );
