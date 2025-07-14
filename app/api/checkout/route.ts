@@ -12,13 +12,14 @@ export async function POST(req: Request) {
     name,
     city,
     address,
-    productId,
     variant,
-    consumables
+    productIds,
+    consumables,
   } = data;
 
-  if (!productId) {
-    return NextResponse.json({ error: "Missing productId" }, { status: 400 });
+  // Validate required fields
+  if (!productIds || !Array.isArray(productIds) || productIds.length === 0) {
+    return NextResponse.json({ error: "Missing productIds" }, { status: 400 });
   }
 
   // Step 1: Find or create user
@@ -41,22 +42,14 @@ export async function POST(req: Request) {
     }
   }
 
-  // Step 2: Generate confirmation token
+  // Step 2: Create intent (order)
   const confirmationToken = randomUUID();
 
-const allProductIds = [
-  productId,                      // the main product
-  ...((consumables as { id: string }[] | undefined) ?? []).map((c) => c.id),
-];
+  const allProductIds = [
+    ...productIds,
+    ...((consumables as string[] | undefined) ?? []),
+  ];
 
-await prisma.intentProduct.createMany({
-  data: allProductIds.map(pid => ({
-    intentId: intent.id,
-    productId: pid
-  }))
-});
-
-  // Step 3: Create intent (order)
   const intent = await prisma.intent.create({
     data: {
       userId: user?.id,

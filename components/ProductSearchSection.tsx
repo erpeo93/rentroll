@@ -17,7 +17,7 @@ const [categories, setCategories] = useState<{ slug: string; name: string }[]>([
 const [activeType, setActiveType] = useState<'ENTERTAINMENT' | 'CONSUMABLE'>('ENTERTAINMENT');
 
 useEffect(() => {
-  fetch("/api/categories?type=${activeType}")
+  fetch(`/api/categories?type=${activeType}`)
     .then(res => res.json())
     .then(data => {
       setCategories(
