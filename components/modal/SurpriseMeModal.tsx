@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useTranslation } from '@/lib/i18n';
 import { useCart } from '@/lib/cart-context';
-import CheckoutModal from './CheckoutModal';
+import { useUIContext } from '@/lib/UIContext';
 
 type Question = {
   key: string;
@@ -15,15 +15,14 @@ type Question = {
 export default function SurpriseMeModal({ onClose }: { onClose: () => void }) {
   const { t } = useTranslation();
   const { addItem } = useCart();
+  const {startCheckout, setShowSurpriseModal } = useUIContext();
 
   const [categories, setCategories] = useState<{ slug: string; name: string }[]>([]);
   const [selectedCategory, setSelectedCategory] = useState('');
   const [formData, setFormData] = useState<Record<string, string>>({});
   const [answered, setAnswered] = useState<Record<string, boolean>>({});
   const [questionProgress, setQuestionProgress] = useState(1);
-
   const [suggestedProduct, setSuggestedProduct] = useState<any | null>(null);
-  const [showCheckout, setShowCheckout] = useState(false);
 
   useEffect(() => {
     fetch('/api/categories?type=ENTERTAINMENT')
@@ -116,23 +115,26 @@ export default function SurpriseMeModal({ onClose }: { onClose: () => void }) {
     }
   };
 
-  const handleSubmit = async () => {
-    const params = new URLSearchParams({
-      category: selectedCategory,
-      type: 'ENTERTAINMENT',
-      ...formData,
-    });
+const handleSubmit = async () => {
+  const params = new URLSearchParams({
+    category: selectedCategory,
+    type: 'ENTERTAINMENT',
+    ...formData,
+  });
 
-    const res = await fetch(`/api/products?${params.toString()}`);
-    const data = await res.json();
-    if (data.length > 0) {
-      const random = data[Math.floor(Math.random() * data.length)];
-      setSuggestedProduct(random);
-    } else {
-      alert('No matching products found');
-      onClose();
-    }
-  };
+  const res = await fetch(`/api/products?${params.toString()}`);
+  const data = await res.json();
+
+  if (data.length > 0) {
+    const random = data[Math.floor(Math.random() * data.length)];
+
+    setShowSurpriseModal(false);
+    startCheckout(random);
+  } else {
+    alert('No matching products found');
+    onClose();
+  }
+};
 
   return (
     <div
@@ -203,43 +205,6 @@ export default function SurpriseMeModal({ onClose }: { onClose: () => void }) {
               </>
             )}
           </>
-        )}
-
-        {suggestedProduct && (
-          <div>
-            <h2 className="text-lg font-bold mb-4">🎉 {t('surprise_result')}</h2>
-            <div className="mb-4">
-              <h3 className="font-semibold">{suggestedProduct.name}</h3>
-              <p>{t(`category_${suggestedProduct.category?.slug}`)}</p>
-            </div>
-            <div className="flex gap-2">
-              <button
-                onClick={() => setShowCheckout(true)}
-                className="bg-blue-600 text-white px-4 py-2 rounded"
-              >
-                {t('buy_now')}
-              </button>
-              <button
-                onClick={() => {
-                  addItem(suggestedProduct);
-                  onClose();
-                }}
-                className="bg-gray-600 text-white px-4 py-2 rounded"
-              >
-                {t('add_to_cart')}
-              </button>
-            </div>
-          </div>
-        )}
-
-        {showCheckout && suggestedProduct && (
-          <CheckoutModal
-            product={suggestedProduct}
-            onClose={() => {
-              setShowCheckout(false);
-              onClose();
-            }}
-          />
         )}
       </div>
     </div>

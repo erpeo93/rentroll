@@ -137,3 +137,9 @@ enum CategoryType {
   ENTERTAINMENT
   CONSUMABLE
 }
+
+model ImprovementSubmission {
+  id        String   @id @default(uuid())
+  answers   Json
+  createdAt DateTime @default(now())
+}

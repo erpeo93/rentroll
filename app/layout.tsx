@@ -6,10 +6,12 @@ import { I18nProvider } from '../lib/i18n';
 import { CartProvider, useCart } from '@/lib/cart-context';
 import CheckoutModal from '@/components/modal/CheckoutModal';
 import FloatingCartButton from '@/components/FloatingCartButton';
+import { UIProvider, useUIContext } from '@/lib/UIContext';
+import Header from '@/components/layout/Header';
 
 function LayoutWithCart({ children }: { children: ReactNode }) {
-  const [isCheckoutOpen, setCheckoutOpen] = useState(false);
   const { items: cartItems } = useCart();
+  const { selectedProduct, isCheckoutOpen, closeCheckout } = useUIContext();
 
   return (
     <>
@@ -21,9 +23,9 @@ function LayoutWithCart({ children }: { children: ReactNode }) {
       )}
 
       {/* Show checkout modal in "cart" mode */}
-      {isCheckoutOpen && (
-        <CheckoutModal
-          onClose={() => setCheckoutOpen(false)}
+      {isCheckoutOpen && selectedProduct && (
+        <CheckoutModal product={selectedProduct}
+          onClose={() => {closeCheckout }}
         />
       )}
     </>
@@ -39,12 +41,14 @@ export default function RootLayout({ children }: { children: ReactNode }) {
 
   return (
     <html lang={lang}>
-      <head />
-      <body>
+      <body className="bg-gray-50 text-gray-900">
         <CartProvider>
+	<UIProvider>
+        <Header />
           <I18nProvider lang={lang}>
             <LayoutWithCart>{children}</LayoutWithCart>
           </I18nProvider>
+	</UIProvider>
         </CartProvider>
       </body>
     </html>

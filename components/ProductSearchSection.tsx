@@ -5,8 +5,18 @@ import CheckoutModal from './modal/CheckoutModal';
 import RequestProductModal from './modal/RequestProductModal';
 import { useEffect, useState } from 'react';
 import SurpriseMeModal from './modal/SurpriseMeModal'; // adjust path if needed
+import { useRouter, usePathname } from 'next/navigation';
+import { useUIContext } from '@/lib/UIContext';
 
-export default function ProductSearchSection() {
+interface ProductSearchSectionProps {
+  activeType: 'ENTERTAINMENT' | 'CONSUMABLE';
+  setActiveType: (type: 'ENTERTAINMENT' | 'CONSUMABLE') => void;
+}
+
+export default function ProductSearchSection({
+  activeType,
+  setActiveType
+}: ProductSearchSectionProps) {
   const { t } = useTranslation();
   const [search, setSearch] = useState('');
   const [category, setCategory] = useState('');
@@ -15,8 +25,9 @@ const [suggestions, setSuggestions] = useState<string[]>([]);
 const [selectedProduct, setSelectedProduct] = useState<any | null>(null);
 const [showRequestModal, setShowRequestModal] = useState(false);
 const [categories, setCategories] = useState<{ slug: string; name: string }[]>([]);
-const [activeType, setActiveType] = useState<'ENTERTAINMENT' | 'CONSUMABLE'>('ENTERTAINMENT');
-const [showSurpriseModal, setShowSurpriseModal] = useState(false);
+const router = useRouter();
+
+const { setShowSurpriseModal } = useUIContext();
 
 useEffect(() => {
   fetch(`/api/categories?type=${activeType}`)
@@ -157,8 +168,8 @@ useEffect(() => {
       </div>
 
 <div style={{ marginTop: "2rem", textAlign: "center" }}>
-  <p>Didn't find what you're looking for?</p>
-  <button onClick={() => setShowRequestModal(true)}>Request a Product</button>
+  <p>Do you have feedback for us?</p>
+  <button onClick={() => router.push('/help-us-improve')}>Help Us Improve</button>
 </div>
 
 {selectedProduct && (
@@ -167,13 +178,6 @@ useEffect(() => {
     productType={selectedProduct.category?.type || 'ENTERTAINMENT'}
     onClose={() => setSelectedProduct(null)}
   />
-)}
-
-{showRequestModal && (
-  <RequestProductModal onClose={() => setShowRequestModal(false)} />
-)}
-{showSurpriseModal && (
-  <SurpriseMeModal onClose={() => setShowSurpriseModal(false)} />
 )}
     </section>
   );

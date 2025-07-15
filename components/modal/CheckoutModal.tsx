@@ -4,15 +4,15 @@ import { useState, useEffect } from 'react';
 import { CartItem, useCart  } from '@/lib/cart-context';
 import { generateDeliverySlots, DeliverySlot } from '@/lib/delivery-slots';
 import { useTranslation } from '@/lib/i18n';
+import { useRouter, usePathname } from 'next/navigation';
+import { Product, ProductCategory } from "@prisma/client";
+
+type ProductWithCategory = Product & {
+  category?: ProductCategory;
+};
 
 type Props = {
-  product?: {
-    id: string;
-    name: string;
-    imageUrl: string;
-    description?: string;
-    category?: { name: string };
-  };
+  product?: ProductWithCategory;
   productType?: string;
   startStep?: number;
   onClose: () => void;
@@ -88,6 +88,7 @@ function ExtrasStep({
 
 export default function CheckoutModal({ product, productType, startStep, onClose }: Props) {
 
+const router = useRouter();
   const isBuyNow = !!product;
   const { items: cartItems, addItem, clearCart } = useCart();
 const { t } = useTranslation();
@@ -242,11 +243,13 @@ style={{
                   <>
 {product ? (
   <div className="flex flex-col items-center gap-6">
+{product.imageUrl && (
     <img
       src={product.imageUrl}
       alt={product.name}
       className="w-full max-w-sm rounded-xl shadow-md object-contain"
     />
+)}
 
     <div className="text-center space-y-2">
       <h2 className="text-2xl font-semibold">{product.name}</h2>
@@ -354,7 +357,7 @@ isSupportedCity ? (
 )}
 <button onClick={() => {
     if (isAddressValidAndUnsupported) {
-      //router.push('/help-us-improve');
+      router.push('/help-us-improve');
     } else {
       setStep(3);
     }
