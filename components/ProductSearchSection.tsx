@@ -62,9 +62,9 @@ export default function ProductSearchSection({
   return (
     <section className="p-8 bg-neutral-50 min-h-[70vh] flex flex-col gap-6">
 
-      <div className="w-2/3 mx-auto bg-neutral-200 rounded-lg p-6 shadow-md">
+      <div className="w-[90%] mx-auto bg-neutral-200 rounded-lg p-6 shadow-md">
       {/* Filters bar */}
-      <div className="w-2/3 mx-auto flex flex-col sm:flex-row items-center justify-center gap-4 mb-4">
+      <div className="w-[90%] mx-auto flex flex-col sm:flex-row items-center justify-center gap-4 mb-4">
 
         {/* Type dropdown */}
         <select
@@ -133,26 +133,36 @@ export default function ProductSearchSection({
       </div>
 
       {/* Products grid */}
-        <main className="grid grid-cols-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-6">
-          {products.map(product => (
-            <div
-              key={product.id}
-              onClick={() => setSelectedProduct(product)}
-              className="cursor-pointer bg-white rounded-lg border border-neutral-300 p-4 shadow-sm hover:shadow-md transition flex flex-col justify-between aspect-square"
-            >
-        <img
-          src={'catan.jfif' /*product.imageUrl || 'catan.jfif'*/}
-          alt={product.name}
-          className="w-full h-full object-cover"
-          loading="lazy"
-        />
-              <div>
-                <h3 className="font-semibold text-lg mb-1">{product.name}</h3>
-                <p className="text-sm text-neutral-600">{t(`category_${product.category?.slug}`)}</p>
-              </div>
-            </div>
-          ))}
-        </main>
+<main className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-6">
+  {products.map(product => (
+    <div
+      key={product.id}
+      onClick={() => setSelectedProduct(product)}
+      className="cursor-pointer bg-white rounded-lg border border-neutral-300 p-4 shadow-sm hover:shadow-md transition flex flex-col justify-between aspect-square"
+    >
+      {/* Image container - fills available space, maintains square ratio */}
+      <img
+        src={'catan.jfif' /*product.imageUrl || 'catan.jfif'*/}
+        alt={product.name}
+        className="w-full h-full object-cover rounded-md"
+        loading="lazy"
+      />
+
+      {/* Text container */}
+      <div className="mt-3">
+        {/* Product name with responsive font size and clamp */}
+        <h3 className="font-semibold text-base sm:text-lg lg:text-lg mb-1 truncate" title={product.name}>
+          {product.name}
+        </h3>
+
+        {/* Category subtitle - smaller text on smaller screens */}
+        <p className="text-xs sm:text-sm text-neutral-600 truncate" title={t(`category_${product.category?.slug}`)}>
+          {t(`category_${product.category?.slug}`)}
+        </p>
+      </div>
+    </div>
+  ))}
+</main>
       </div>
 
       {/* Help Us Improve */}
