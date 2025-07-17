@@ -2,10 +2,8 @@
 
 import { useTranslation } from '../lib/i18n';
 import CheckoutModal from './modal/CheckoutModal';
-import RequestProductModal from './modal/RequestProductModal';
 import { useEffect, useState } from 'react';
-import SurpriseMeModal from './modal/SurpriseMeModal'; // adjust path if needed
-import { useRouter, usePathname } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import { useUIContext } from '@/lib/UIContext';
 
 interface ProductSearchSectionProps {
@@ -20,165 +18,162 @@ export default function ProductSearchSection({
   const { t } = useTranslation();
   const [search, setSearch] = useState('');
   const [category, setCategory] = useState('');
-const [products, setProducts] = useState<any[]>([]);
-const [suggestions, setSuggestions] = useState<string[]>([]);
-const [selectedProduct, setSelectedProduct] = useState<any | null>(null);
-const [showRequestModal, setShowRequestModal] = useState(false);
-const [categories, setCategories] = useState<{ slug: string; name: string }[]>([]);
-const router = useRouter();
+  const [products, setProducts] = useState<any[]>([]);
+  const [suggestions, setSuggestions] = useState<string[]>([]);
+  const [selectedProduct, setSelectedProduct] = useState<any | null>(null);
+  const [categories, setCategories] = useState<{ slug: string; name: string }[]>([]);
+  const router = useRouter();
+  const { setShowSurpriseModal } = useUIContext();
 
-const { setShowSurpriseModal } = useUIContext();
+  // Fetch categories for the active type
+  useEffect(() => {
+    fetch(`/api/categories?type=${activeType}`)
+      .then(res => res.json())
+      .then(data => {
+        setCategories(
+          data.map((c: any) => ({
+            slug: c.slug,
+            name: t(`category_${c.slug}`) || c.name
+          }))
+        );
+        setCategory(''); // reset category filter when activeType changes
+      });
+  }, [t, activeType]);
 
-useEffect(() => {
-  fetch(`/api/categories?type=${activeType}`)
-    .then(res => res.json())
-    .then(data => {
-      setCategories(
-        data.map((c: any) => ({
-          slug: c.slug,
-          name: t(`category_${c.slug}`) || c.name
-        }))
-      );
-    });
-}, [t, activeType]);
+  // Fetch products on filters change
+  useEffect(() => {
+    const q = new URLSearchParams();
+    if (search) q.set("name", search);
+    if (category) q.set("category", category);
+    if (activeType) q.set("type", activeType);
 
-useEffect(() => {
-  const q = new URLSearchParams();
-  if (search) q.set("name", search);
-  if (category) q.set("category", category);
- if (activeType) q.set("type", activeType);
+    const url = `/api/products?${q.toString()}`;
+    fetch(url)
+      .then(res => res.json())
+      .then(data => {
+        setProducts(data);
 
-  const url = `/api/products?${q.toString()}`;
-  fetch(url)
-    .then(res => res.json())
-    .then(data => {
-      setProducts(data);
-
-      // Live suggestions (names only)
-      const uniqueNames = Array.from(new Set(data.map((p: any) => p.name))) as string[];
-      setSuggestions(uniqueNames.slice(0, 5));
-    });
-
-}, [search, category, activeType]);
+        // Update live suggestions (unique product names)
+        const uniqueNames = Array.from(new Set(data.map((p: any) => p.name))) as string[];
+        setSuggestions(uniqueNames.slice(0, 5));
+      });
+  }, [search, category, activeType]);
 
   return (
-    <section style={{ padding: "2rem" }}>
+    <section className="p-8 bg-neutral-50 min-h-[70vh] flex flex-col gap-6">
 
+      <div className="w-2/3 mx-auto bg-neutral-200 rounded-lg p-6 shadow-md">
+      {/* Filters bar */}
+      <div className="w-2/3 mx-auto flex flex-col sm:flex-row items-center justify-center gap-4 mb-4">
 
-<div style={{ display: "flex", justifyContent: "center", marginBottom: "1.5rem" }}>
-  <div style={{
-    display: "flex",
-    background: "#1a1a1a",
-    borderRadius: "9999px",
-    padding: "0.25rem",
-    border: "1px solid #333"
-  }}>
-    {["ENTERTAINMENT", "CONSUMABLE"].map((type) => (
-      <button
-        key={type}
-        onClick={() => setActiveType(type as any)}
-        style={{
-          padding: "0.5rem 1.25rem",
-          borderRadius: "9999px",
-          background: activeType === type ? "#fff" : "transparent",
-          color: activeType === type ? "#000" : "#ccc",
-          border: "none",
-          fontWeight: "bold",
-          cursor: "pointer",
-          transition: "all 0.2s ease"
-        }}
-      >
-        {type === "ENTERTAINMENT" ? "🎮 Entertainment" : "🍿 Consumables"}
-      </button>
-    ))}
-  </div>
-</div>
+        {/* Type dropdown */}
+        <select
+          value={activeType}
+          onChange={(e) => setActiveType(e.target.value as 'ENTERTAINMENT' | 'CONSUMABLE')}
+          className="filter-select"
+          aria-label="Select product type"
+          style={{ minWidth: 150 }}
+        >
+          <option value="ENTERTAINMENT">Entertainment</option>
+          <option value="CONSUMABLE">Consumables</option>
+        </select>
 
+        {/* Category dropdown */}
+        <select
+          id="category"
+          value={category}
+          onChange={(e) => setCategory(e.target.value)}
+          className="filter-select"
+          style={{ minWidth: 180 }}
+        >
+          <option value="">{t('all_categories') || 'All Categories'}</option>
+          {categories.map(c => (
+            <option key={c.slug} value={c.slug}>
+              {c.name}
+            </option>
+          ))}
+        </select>
 
-      <h2>{t("search_title")}</h2>
+        {/* Search input */}
+        <div className="relative w-full sm:w-auto">
+          <input
+            id="search"
+            type="text"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            autoComplete="off"
+            className="rounded-md border border-neutral-300 p-2 focus:ring-2 focus:ring-indigo-500 w-full sm:w-auto"
+            placeholder={t('search_placeholder') || 'Search by name'}
+          />
+          {/* Suggestions */}
+          {search.length > 0 && suggestions.length > 0 && (
+            <ul className="absolute left-0 right-0 bg-white border border-neutral-300 rounded-md max-h-40 overflow-y-auto shadow-sm z-10 mt-1">
+              {suggestions.map(name => (
+                <li
+                  key={name}
+                  onClick={() => setSearch(name)}
+                  className="cursor-pointer px-3 py-1 hover:bg-indigo-100"
+                >
+                  {name}
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
 
-      <div style={{ marginBottom: "1rem" }}>
-{activeType === "ENTERTAINMENT" && (
-  <button
-    onClick={() => setShowSurpriseModal(true)}
-    style={{
-      marginTop: "1rem",
-      backgroundColor: "#4f46e5",
-      color: "white",
-      padding: "0.5rem 1rem",
-      borderRadius: "8px",
-      fontWeight: "bold",
-      cursor: "pointer",
-      border: "none"
-    }}
-  >
-    🎲 {t("surprise_me") || "Surprise Me!"}
-  </button>
-)}
-        <input
-          placeholder="Search by name"
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          style={{ marginRight: "1rem" }}
-        />
-
-{search.length > 0 && suggestions.length > 0 && (
-  <ul style={{ background: "#fff", padding: "0.5rem", listStyle: "none", marginTop: "0.5rem" }}>
-    {suggestions.map((name) => (
-      <li
-        key={name}
-        style={{ cursor: "pointer" }}
-        onClick={() => setSearch(name)}
-      >
-        {name}
-      </li>
-    ))}
-  </ul>
-)}
-
-<select value={category} onChange={(e) => setCategory(e.target.value)}>
-  <option value="">All Categories</option>
-  {categories.map((c) => (
-    <option key={c.slug} value={c.slug}>
-      {c.name}
-    </option>
-  ))}
-</select>
-      </div>
-
-
-      <div style={{ display: "flex", flexWrap: "wrap", gap: "1rem" }}>
-        {products.map((product) => (
-          <div
-            key={product.id}
-            onClick={() => setSelectedProduct(product)}
-            style={{
-              border: "1px solid #ccc",
-              borderRadius: "8px",
-              padding: "1rem",
-              width: "200px",
-              cursor: "pointer",
-              background: "#fff"
-            }}
+        {/* Surprise Me button (only for Entertainment) */}
+        {activeType === 'ENTERTAINMENT' && (
+          <button
+            onClick={() => setShowSurpriseModal(true)}
+            className="bg-indigo-600 hover:bg-indigo-700 text-white py-2 px-4 rounded-md font-semibold transition whitespace-nowrap"
           >
-            <h3>{product.name}</h3>
-            <p>{t(`category_${product.category?.slug}`)}</p>
-          </div>
-        ))}
+            {t('surprise_me') || 'Surprise Me!'}
+          </button>
+        )}
       </div>
 
-<div style={{ marginTop: "2rem", textAlign: "center" }}>
-  <p>Do you have feedback for us?</p>
-  <button onClick={() => router.push('/help-us-improve')}>Help Us Improve</button>
-</div>
+      {/* Products grid */}
+        <main className="grid grid-cols-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-6">
+          {products.map(product => (
+            <div
+              key={product.id}
+              onClick={() => setSelectedProduct(product)}
+              className="cursor-pointer bg-white rounded-lg border border-neutral-300 p-4 shadow-sm hover:shadow-md transition flex flex-col justify-between aspect-square"
+            >
+        <img
+          src={'catan.jfif' /*product.imageUrl || 'catan.jfif'*/}
+          alt={product.name}
+          className="w-full h-full object-cover"
+          loading="lazy"
+        />
+              <div>
+                <h3 className="font-semibold text-lg mb-1">{product.name}</h3>
+                <p className="text-sm text-neutral-600">{t(`category_${product.category?.slug}`)}</p>
+              </div>
+            </div>
+          ))}
+        </main>
+      </div>
 
-{selectedProduct && (
-  <CheckoutModal
-    product={selectedProduct}
-    productType={selectedProduct.category?.type || 'ENTERTAINMENT'}
-    onClose={() => setSelectedProduct(null)}
-  />
-)}
+      {/* Help Us Improve */}
+      <div className="mt-8 text-center">
+        <p className="mb-2 text-neutral-700">Do you have feedback for us?</p>
+        <button
+          onClick={() => router.push('/help-us-improve')}
+          className="text-indigo-600 hover:text-indigo-800 font-semibold"
+        >
+          Help Us Improve
+        </button>
+      </div>
+
+      {/* Checkout modal */}
+      {selectedProduct && (
+        <CheckoutModal
+          product={selectedProduct}
+          productType={selectedProduct.category?.type || 'ENTERTAINMENT'}
+          onClose={() => setSelectedProduct(null)}
+        />
+      )}
     </section>
   );
 }

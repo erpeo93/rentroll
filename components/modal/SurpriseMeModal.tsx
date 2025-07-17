@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { useTranslation } from '@/lib/i18n';
 import { useCart } from '@/lib/cart-context';
 import { useUIContext } from '@/lib/UIContext';
+import { ModalWrapper } from '@/components/modal/ModalStyles';
 
 type Question = {
   key: string;
@@ -15,14 +16,13 @@ type Question = {
 export default function SurpriseMeModal({ onClose }: { onClose: () => void }) {
   const { t } = useTranslation();
   const { addItem } = useCart();
-  const {startCheckout, setShowSurpriseModal } = useUIContext();
+  const { startCheckout, setShowSurpriseModal } = useUIContext();
 
   const [categories, setCategories] = useState<{ slug: string; name: string }[]>([]);
   const [selectedCategory, setSelectedCategory] = useState('');
   const [formData, setFormData] = useState<Record<string, string>>({});
   const [answered, setAnswered] = useState<Record<string, boolean>>({});
   const [questionProgress, setQuestionProgress] = useState(1);
-  const [suggestedProduct, setSuggestedProduct] = useState<any | null>(null);
 
   useEffect(() => {
     fetch('/api/categories?type=ENTERTAINMENT')
@@ -115,98 +115,89 @@ export default function SurpriseMeModal({ onClose }: { onClose: () => void }) {
     }
   };
 
-const handleSubmit = async () => {
-  const params = new URLSearchParams({
-    category: selectedCategory,
-    type: 'ENTERTAINMENT',
-    ...formData,
-  });
+  const handleSubmit = async () => {
+    const params = new URLSearchParams({
+      category: selectedCategory,
+      type: 'ENTERTAINMENT',
+      ...formData,
+    });
 
-  const res = await fetch(`/api/products?${params.toString()}`);
-  const data = await res.json();
+    const res = await fetch(`/api/products?${params.toString()}`);
+    const data = await res.json();
 
-  if (data.length > 0) {
-    const random = data[Math.floor(Math.random() * data.length)];
+    if (data.length > 0) {
+      const random = data[Math.floor(Math.random() * data.length)];
 
-    setShowSurpriseModal(false);
-    startCheckout(random);
-  } else {
-    alert('No matching products found');
-    onClose();
-  }
-};
+      setShowSurpriseModal(false);
+      startCheckout(random);
+    } else {
+      alert('No matching products found');
+      onClose();
+    }
+  };
 
   return (
-    <div
-      onClick={(e) => {
-        if (e.target === e.currentTarget) onClose();
-      }}
-      className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
-    >
-      <div className="bg-white rounded-lg p-6 w-full max-w-md relative max-h-[90vh] overflow-y-auto">
-        <button className="absolute top-4 right-4" onClick={onClose}>
-          ✖
-        </button>
+    <ModalWrapper onClose={onClose}>
+      {/* ModalWrapper handles overlay, close button, container etc */}
 
-        {!suggestedProduct && (
-          <>
-            <h2 className="text-lg font-bold mb-2">{t('surprise_step_category')}</h2>
-            <select
-              value={selectedCategory}
-              onChange={(e) => {
-                const newCat = e.target.value;
-                setSelectedCategory(newCat);
-                setFormData({});
-                setAnswered({});
-                setQuestionProgress(1);
-              }}
-              className="w-full border p-2 rounded mb-4"
-            >
-              <option value="">--</option>
-              {categories.map((c) => (
-                <option key={c.slug} value={c.slug}>
-                  {c.name}
-                </option>
-              ))}
-            </select>
+  <h1 className="text-2xl font-bold mb-1">{t('surprise_me')}</h1>
+  <p className="text-gray-600 mb-6">{t('surprise_me_subtitle')}</p>
 
-            {selectedCategory && questionSets[selectedCategory] && (
-              <>
-                {questionSets[selectedCategory]
-                  .slice(0, questionProgress)
-                  .map((q) => (
-                    <div key={q.key} className="mb-4">
-                      <label className="block font-semibold mb-1">{q.label}</label>
-                      <select
-                        value={formData[q.key] || ''}
-                        onChange={(e) => handleChange(q.key, e.target.value)}
-                        className="w-full border p-2 rounded"
-                      >
-                        <option value="">--</option>
-                        {q.options.map((opt) => (
-                          <option key={opt.value} value={opt.value}>
-                            {opt.label}
-                          </option>
-                        ))}
-                      </select>
-                    </div>
-                  ))}
-
-                {questionSets[selectedCategory].every(
-                  (q) => !q.required || answered[q.key]
-                ) && (
-                  <button
-                    onClick={handleSubmit}
-                    className="mt-2 bg-green-600 text-white px-4 py-2 rounded"
-                  >
-                    {t('surprise_submit')}
-                  </button>
-                )}
-              </>
-            )}
-          </>
-        )}
-      </div>
+<div className="mb-6 flex items-center space-x-4">
+  <label htmlFor="category-select" className="w-1/3 font-semibold">
+    {t('surprise_step_category')}
+  </label>
+  <select
+    id="category-select"
+    value={selectedCategory}
+    onChange={(e) => {
+      const newCat = e.target.value;
+      setSelectedCategory(newCat);
+      setFormData({});
+      setAnswered({});
+      setQuestionProgress(1);
+    }}
+    className="w-2/3 border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+  >
+    <option value="">--</option>
+    {categories.map((c) => (
+      <option key={c.slug} value={c.slug}>
+        {c.name}
+      </option>
+    ))}
+  </select>
+</div>
+      {selectedCategory && questionSets[selectedCategory] && (
+        <>
+{questionSets[selectedCategory]
+  .slice(0, questionProgress)
+  .map((q) => (
+    <div key={q.key} className="mb-4 flex items-center space-x-4">
+      <label className="w-1/3 font-semibold">{q.label}</label>
+      <select
+        value={formData[q.key] || ''}
+        onChange={(e) => handleChange(q.key, e.target.value)}
+        className="w-2/3 border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+      >
+        <option value="">--</option>
+        {q.options.map((opt) => (
+          <option key={opt.value} value={opt.value}>
+            {opt.label}
+          </option>
+        ))}
+      </select>
     </div>
+  ))}
+          {questionSets[selectedCategory].every((q) => !q.required || answered[q.key]) && (
+            <button
+              onClick={handleSubmit}
+              className="mt-4 bg-green-600 hover:bg-green-700 text-white font-semibold px-4 py-2 rounded"
+            >
+              {t('surprise_submit')}
+            </button>
+          )}
+        </>
+      )}
+    </ModalWrapper>
   );
 }

@@ -60,14 +60,14 @@ export default function ProductCarousel() {
       >
         {/* Arrows (Desktop only) */}
         <button
-          className="hidden md:flex absolute left-4 top-1/2 transform -translate-y-1/2 z-20 text-white bg-black/50 p-2 rounded-full hover:bg-black/80"
+          className="carousel-arrow hidden md:flex absolute left-4 top-1/2 transform -translate-y-1/2 z-20 text-white p-2 rounded-full"
           onClick={prev}
           aria-label={t('previous')}
         >
           <ChevronLeft size={28} />
         </button>
         <button
-          className="hidden md:flex absolute right-4 top-1/2 transform -translate-y-1/2 z-20 text-white bg-black/50 p-2 rounded-full hover:bg-black/80"
+          className="carousel-arrow hidden md:flex absolute right-4 top-1/2 transform -translate-y-1/2 z-20 text-white p-2 rounded-full"
           onClick={next}
           aria-label={t('next')}
         >
@@ -79,30 +79,33 @@ export default function ProductCarousel() {
           ref={carouselRef}
           className="w-full overflow-x-auto scroll-smooth no-scrollbar flex gap-6"
         >
-          {products.map((product, i) => (
-            <div
-              key={product.id}
-              ref={i === 0 ? productRef : null}
-              className="flex-shrink-0 w-full sm:w-1/2 md:w-1/3 lg:w-1/4 cursor-pointer scale-90 hover:scale-100 transition-transform"
-              onClick={() => setSelectedProduct(product)}
-            >
-              <div className="aspect-square bg-white rounded-2xl shadow-lg overflow-hidden relative">
-                <img
-                  src={'catan.jfif' /*product.imageUrl || 'catan.jfif'*/}
-                  alt={product.name}
-                  className="w-full h-full object-cover"
-                  loading="lazy"
-                />
+{products.map((product, i) => (
+  <div
+    key={product.id}
+    ref={i === 0 ? productRef : null}
+    className="flex-shrink-0 w-full sm:w-1/2 md:w-1/3 lg:w-1/4 cursor-pointer scale-90 hover:scale-100 transition-transform"
+    onClick={() => setSelectedProduct(product)}
+  >
+    {/* Widget container */}
+    <div className="p-4 border border-gray-300 rounded-2xl shadow-md hover:shadow-xl transition-shadow duration-300 bg-white">
+      <div className="aspect-square rounded-xl overflow-hidden relative">
+        <img
+          src={'catan.jfif' /*product.imageUrl || 'catan.jfif'*/}
+          alt={product.name}
+          className="w-full h-full object-cover"
+          loading="lazy"
+        />
 
-                <div className="absolute bottom-4 left-4 right-4 bg-white/80 backdrop-blur-sm p-4 rounded-xl text-neutral-900 shadow-md max-w-[50%]">
-                  <h2 className="text-lg font-semibold">{product.name}</h2>
-                  {product.description && (
-                    <p className="text-sm mt-1 line-clamp-2">{product.description}</p>
-                  )}
-                </div>
-              </div>
-            </div>
-          ))}
+        <div className="absolute bottom-4 left-4 bg-white/80 backdrop-blur-sm p-4 rounded-xl text-neutral-900 shadow-md min-w-[66%] max-w-[66%]">
+          <h2 className="text-lg font-semibold">{product.name}</h2>
+          {product.description && (
+            <p className="text-sm mt-1 line-clamp-2">{product.description}</p>
+          )}
+        </div>
+      </div>
+    </div>
+  </div>
+))}
         </div>
 
         {/* Checkout Modal */}
@@ -115,7 +118,7 @@ export default function ProductCarousel() {
         )}
       </section>
 
-      <div className="w-full h-3 bg-white" />
+      <div className="w-full h-15 bg-white" />
     </>
   );
 }
