@@ -46,9 +46,23 @@ const closeCheckout = () => {
   setCheckoutOpen(false);
 };
 
-  const scrollToProductSection = () => {
-    productSectionRef.current?.scrollIntoView({ behavior: 'smooth' });
-  };
+const scrollToProductSection = () => {
+  if (!productSectionRef.current) return;
+
+  // Get the distance from top of document to product section
+  const rect = productSectionRef.current.getBoundingClientRect();
+  const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+
+  // Adjust for fixed header height (replace 60 with your header height in px)
+  const headerHeight = 60;
+
+  const targetPosition = rect.top + scrollTop - headerHeight;
+
+  window.scrollTo({
+    top: targetPosition,
+    behavior: 'smooth',
+  });
+};
 
   return (
     <UIContext.Provider
