@@ -54,7 +54,7 @@ const scrollToProductSection = () => {
   const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
 
   // Adjust for fixed header height (replace 60 with your header height in px)
-  const headerHeight = 60;
+  const headerHeight = 20;
 
   const targetPosition = rect.top + scrollTop - headerHeight;
 
