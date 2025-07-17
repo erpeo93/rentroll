@@ -35,7 +35,7 @@ async function main() {
   }
 
   // Step 3: Seed products
-  const products = [
+  const rawProducts = [
     {
       name: 'Catan',
       value: 3500,
@@ -44,7 +44,12 @@ async function main() {
       categorySlug: 'board-game',
       minPlayers: 3,
       maxPlayers: 4,
-      moodTags: ['competitive', 'strategic']
+      moodTags: ['competitive', 'strategic'],
+      bulletPoints: [
+        'Players trade resources to build settlements',
+        'Great for 3-4 players',
+        'Engages strategic thinking and negotiation'
+      ]
     },
     {
       name: 'Overcooked 2',
@@ -52,7 +57,12 @@ async function main() {
       imageUrl: 'https://example.com/images/overcooked2.jpg',
       description: 'Chaos in the kitchen! A hilarious co-op cooking game.',
       categorySlug: 'video-game',
-      moodTags: ['funny', 'cooperative']
+      moodTags: ['funny', 'cooperative'],
+      bulletPoints: [
+        'Cooperative gameplay with friends',
+        'Time-management and teamwork challenges',
+        'Multiple chaotic kitchen scenarios'
+      ]
     },
     {
       name: 'The Lord of the Rings',
@@ -60,7 +70,12 @@ async function main() {
       imageUrl: 'https://example.com/images/lotr.jpg',
       description: 'The epic fantasy novel that started it all.',
       categorySlug: 'book',
-      moodTags: ['epic', 'adventure']
+      moodTags: ['epic', 'adventure'],
+      bulletPoints: [
+        'Classic epic fantasy novel',
+        'Rich world-building and characters',
+        'Perfect for adventure lovers'
+      ]
     },
     {
       name: 'Inception',
@@ -68,7 +83,12 @@ async function main() {
       imageUrl: 'https://example.com/images/inception.jpg',
       description: 'A mind-bending thriller by Christopher Nolan.',
       categorySlug: 'film',
-      moodTags: ['sci-fi', 'thriller']
+      moodTags: ['sci-fi', 'thriller'],
+      bulletPoints: [
+        'Complex plot with multiple dream layers',
+        'Directed by Christopher Nolan',
+        'Thrilling and thought-provoking'
+      ]
     },
     {
       name: 'Popcorn',
@@ -76,7 +96,12 @@ async function main() {
       imageUrl: 'https://example.com/images/popcorn.jpg',
       description: 'Perfect buttery popcorn for movie night.',
       categorySlug: 'snack',
-      moodTags: []
+      moodTags: [],
+      bulletPoints: [
+        'Freshly popped and buttery',
+        'Ideal movie night snack',
+        'Gluten-free'
+      ]
     },
     {
       name: 'Cola',
@@ -84,12 +109,19 @@ async function main() {
       imageUrl: 'https://example.com/images/cola.jpg',
       description: 'Refreshing soft drink to enjoy with snacks.',
       categorySlug: 'drink',
-      moodTags: []
+      moodTags: [],
+      bulletPoints: [
+        'Classic carbonated soft drink',
+        'Pairs well with snacks',
+        'Contains caffeine'
+      ]
     }
   ];
 
-  for (const product of products) {
-    await prisma.product.create({
+  const createdProducts = [];
+
+  for (const product of rawProducts) {
+    const created = await prisma.product.create({
       data: {
         id: uuidv4(),
         name: product.name,
@@ -99,7 +131,29 @@ async function main() {
         minPlayers: product.minPlayers || null,
         maxPlayers: product.maxPlayers || null,
         moodTags: product.moodTags,
-        categoryId: categoryMap[product.categorySlug]
+        categoryId: categoryMap[product.categorySlug],
+        bulletPoints: product.bulletPoints || []
+      }
+    });
+    createdProducts.push(created);
+  }
+
+  // Step 4: Seed example orders
+  const statuses = ['requested', 'scheduled', 'delivered'];
+  const now = new Date();
+  const tomorrow = new Date(now);
+  tomorrow.setDate(tomorrow.getDate() + 1);
+
+  for (let i = 0; i < 10; i++) {
+    const product = createdProducts[i % createdProducts.length];
+    await prisma.order.create({
+      data: {
+        id: uuidv4(),
+        productId: product.id,
+        variant: null,
+        createdAt: now,
+        deliveryDate: tomorrow,
+        status: statuses[i % statuses.length]
       }
     });
   }

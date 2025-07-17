@@ -23,10 +23,20 @@ const topProducts = await prisma.order.groupBy({
 
   const ids = topProducts.map((p) => p.productId);
 
-  const products = await prisma.product.findMany({
-    where: { id: { in: ids } },
-    include: { category: true }
-  });
+const products = await prisma.product.findMany({
+  where: { id: { in: ids } },
+  select: {
+    id: true,
+    name: true,
+    description: true,
+    imageUrl: true,
+    bulletPoints: true,
+    minPlayers: true,
+    maxPlayers: true,
+    moodTags: true,
+    category: true
+  }
+});
 
   return NextResponse.json(products);
 }

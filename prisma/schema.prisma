@@ -47,6 +47,7 @@ model Product {
   moodTags    String[] // Postgres `text[]` type
   orders    Order[]
   intentProducts IntentProduct[]  @relation("ProductToIntentProduct")
+  bulletPoints String[] 
 }
 
 model ProductInstance {

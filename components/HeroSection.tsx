@@ -13,10 +13,11 @@ export default function HeroSection({ onScrollToCatalog }: Props) {
   const [showFAQ, setShowFAQ] = useState(false);
 
   return (
+<>
     <section
       style={{
-        height: "80vh",
-        backgroundImage: "url('/bg.jfif')",
+        height: "50vh",
+        backgroundImage: "url('/bg2.jpg')",
         backgroundSize: "cover",
         backgroundPosition: "center",
         display: "flex",
@@ -41,5 +42,8 @@ export default function HeroSection({ onScrollToCatalog }: Props) {
 
       {showFAQ && <FAQModal onClose={() => setShowFAQ(false)} />}
     </section>
+
+<div className="w-full h-3 bg-white" />
+</>
   );
 }

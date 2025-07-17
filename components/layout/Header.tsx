@@ -26,15 +26,23 @@ export default function Header() {
         <div className="text-xl font-bold cursor-pointer" onClick={() => router.push('/')}>
           RentRoll
         </div>
-        <nav className="flex gap-4 items-center text-sm font-medium">
-          <button onClick={() => handleScrollTo('ENTERTAINMENT')}>🎮 {t('entertainment')}</button>
-          <button onClick={() => handleScrollTo('CONSUMABLE')}>🍿 {t('consumables')}</button>
-          <button onClick={() => setShowSurpriseModal(true)}>🎲 {t('surprise_me')}</button>
-          <button onClick={toggleLanguage}>🌐 {language === 'en' ? 'IT' : 'EN'}</button>
-          <button onClick={() => setShowFAQModal(true)} className="text-lg text-gray-600">
-            <FaQuestionCircle />
-          </button>
-        </nav>
+<nav className="flex gap-4 items-center text-sm font-medium">
+  <button className="text-button" onClick={() => handleScrollTo('ENTERTAINMENT')}>
+    {t('entertainment')}
+  </button>
+  <button className="text-button" onClick={() => handleScrollTo('CONSUMABLE')}>
+    {t('consumables')}
+  </button>
+  <button className="text-button" onClick={() => setShowSurpriseModal(true)}>
+    {t('surprise_me')}
+  </button>
+  <button className="text-button" onClick={toggleLanguage}>
+    🌐 {language === 'en' ? 'IT' : 'EN'}
+  </button>
+  <button className="text-button text-lg" onClick={() => setShowFAQModal(true)}>
+    <FaQuestionCircle />
+  </button>
+</nav>
       </div>
     </header>
   );
