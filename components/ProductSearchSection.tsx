@@ -136,12 +136,12 @@ export default function ProductSearchSection({
       </div>
 
       {/* Products grid */}
-<main className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-6">
+<main className="flex flex-wrap gap-6 justify-center">
   {products.map(product => (
     <div
       key={product.id}
       onClick={() => setSelectedProduct(product)}
-      className="cursor-pointer bg-white rounded-lg border border-neutral-300 p-4 scale-100 hover:scale-105 shadow-sm hover:shadow-md transition flex flex-col justify-between aspect-square transition-transform duration-300"
+      className="w-full sm:w-1/2 md:w-1/3 lg:w-1/4 xl:w-1/5 2xl:w-1/6 cursor-pointer bg-white rounded-lg border border-neutral-300 p-4 scale-100 hover:scale-105 shadow-sm hover:shadow-md transition flex flex-col justify-between aspect-square transition-transform duration-300"
     >
       {/* Image container - fills available space, maintains square ratio */}
       <img
