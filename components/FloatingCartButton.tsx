@@ -10,9 +10,6 @@ export default function FloatingCartButton() {
 
   const isCartPage = pathname === '/cart';
 
-  // Always show on cart page for "Back to Home"
-  if (items.length === 0 && !isCartPage) return null;
-
   const handleClick = () => {
     if (isCartPage) {
       router.push('/');

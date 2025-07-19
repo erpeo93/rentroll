@@ -61,10 +61,13 @@ export default function ProductSearchSection({
 
   return (
     <section className="p-8 bg-neutral-50 min-h-[70vh] flex flex-col gap-6">
+      <div className="w-[100%] mx-auto bg-neutral-400 rounded-lg p-6 shadow-md">
+  <div className="mb-4">
+    <h2 className="text-lg font-semibold text-neutral-800">{t('our_catalog')}</h2>
+  </div>
 
-      <div className="w-[90%] mx-auto bg-neutral-200 rounded-lg p-6 shadow-md">
       {/* Filters bar */}
-      <div className="w-[90%] mx-auto flex flex-col sm:flex-row items-center justify-center gap-4 mb-4">
+      <div className="w-[100%] mx-auto flex flex-col sm:flex-row items-center justify-center gap-4 mb-4">
 
         {/* Type dropdown */}
         <select
@@ -138,13 +141,13 @@ export default function ProductSearchSection({
     <div
       key={product.id}
       onClick={() => setSelectedProduct(product)}
-      className="cursor-pointer bg-white rounded-lg border border-neutral-300 p-4 shadow-sm hover:shadow-md transition flex flex-col justify-between aspect-square"
+      className="cursor-pointer bg-white rounded-lg border border-neutral-300 p-4 scale-100 hover:scale-105 shadow-sm hover:shadow-md transition flex flex-col justify-between aspect-square transition-transform duration-300"
     >
       {/* Image container - fills available space, maintains square ratio */}
       <img
         src={'catan.jfif' /*product.imageUrl || 'catan.jfif'*/}
         alt={product.name}
-        className="w-full h-full object-cover rounded-md"
+        className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
         loading="lazy"
       />
 
@@ -167,7 +170,7 @@ export default function ProductSearchSection({
 
       {/* Help Us Improve */}
       <div className="mt-8 text-center">
-        <p className="mb-2 text-neutral-700">Do you have feedback for us?</p>
+        <p className="mb-2 text-neutral-700">Any question or feedback?</p>
         <button
           onClick={() => router.push('/help-us-improve')}
           className="text-indigo-600 hover:text-indigo-800 font-semibold"

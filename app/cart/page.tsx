@@ -34,12 +34,6 @@ export default function CartPage() {
 
           <div className="mt-6 flex justify-between items-center">
             <button
-              onClick={clearCart}
-              className="bg-gray-100 px-4 py-2 rounded hover:bg-gray-200"
-            >
-              Clear Cart
-            </button>
-            <button
               onClick={() => setCheckoutOpen(true)}
               className="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700"
             >

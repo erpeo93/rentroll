@@ -6,6 +6,7 @@ import { I18nProvider } from '../lib/i18n';
 import { CartProvider, useCart } from '@/lib/cart-context';
 import CheckoutModal from '@/components/modal/CheckoutModal';
 import FloatingCartButton from '@/components/FloatingCartButton';
+import FloatingFAQButton from '@/components/FloatingFAQButton';
 import { UIProvider, useUIContext } from '@/lib/UIContext';
 import Header from '@/components/layout/Header';
 
@@ -16,11 +17,8 @@ function LayoutWithCart({ children }: { children: ReactNode }) {
   return (
     <>
       {children}
-
-      {/* Show floating cart button if cart is not empty */}
-      {cartItems.length > 0 && (
+<FloatingFAQButton />
         <FloatingCartButton />
-      )}
 
       {/* Show checkout modal in "cart" mode */}
       {isCheckoutOpen && selectedProduct && (

@@ -91,6 +91,7 @@ export default function ProductCarousel() {
         onTouchStart={handleTouchStart}
         onTouchEnd={handleTouchEnd}
       >
+
         {/* Arrows (Desktop only) */}
         <button
           className="carousel-arrow hidden md:flex absolute left-4 top-1/2 transform -translate-y-1/2 z-20 text-white p-2 rounded-full"
@@ -112,11 +113,12 @@ export default function ProductCarousel() {
           ref={carouselRef}
           className="w-full overflow-x-auto scroll-smooth no-scrollbar flex gap-6 snap-x snap-mandatory"
         >
+
           {products.map((product, i) => (
             <div
               key={product.id}
               ref={i === 0 ? productRef : null}
-              className="flex-shrink-0 w-full sm:w-1/2 md:w-1/3 lg:w-1/4 cursor-pointer scale-90 hover:scale-100 transition-transform snap-start"
+              className="flex-shrink-0 w-full sm:w-1/2 md:w-1/3 lg:w-1/4 cursor-pointer scale-90 hover:scale-95 transition-transform snap-start"
               onClick={() => setSelectedProduct(product)}
             >
               {/* Widget container */}
@@ -151,7 +153,7 @@ export default function ProductCarousel() {
         )}
       </section>
 
-      <div className="w-full h-15 bg-white" />
+      <div className="w-full h-3 bg-white" />
     </>
   );
 }
