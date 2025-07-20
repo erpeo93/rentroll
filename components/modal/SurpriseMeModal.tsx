@@ -127,7 +127,6 @@ export default function SurpriseMeModal({ onClose }: { onClose: () => void }) {
 
     if (data.length > 0) {
       const random = data[Math.floor(Math.random() * data.length)];
-
       setShowSurpriseModal(false);
       startCheckout(random);
     } else {
@@ -138,56 +137,54 @@ export default function SurpriseMeModal({ onClose }: { onClose: () => void }) {
 
   return (
     <ModalWrapper onClose={onClose}>
-      {/* ModalWrapper handles overlay, close button, container etc */}
+      <h1 className="text-2xl font-bold mb-1">{t('surprise_me')}</h1>
+      <p className="text-gray-600 mb-6">{t('surprise_me_subtitle')}</p>
 
-  <h1 className="text-2xl font-bold mb-1">{t('surprise_me')}</h1>
-  <p className="text-gray-600 mb-6">{t('surprise_me_subtitle')}</p>
+      <div className="mb-6 flex flex-col sm:flex-row sm:items-center sm:space-x-4">
+        <label htmlFor="category-select" className="mb-1 sm:mb-0 sm:w-1/3 font-semibold">
+          {t('surprise_step_category')}
+        </label>
+        <select
+          id="category-select"
+          value={selectedCategory}
+          onChange={(e) => {
+            const newCat = e.target.value;
+            setSelectedCategory(newCat);
+            setFormData({});
+            setAnswered({});
+            setQuestionProgress(1);
+          }}
+          className="sm:w-2/3 border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+        >
+          <option value="">--</option>
+          {categories.map((c) => (
+            <option key={c.slug} value={c.slug}>
+              {c.name}
+            </option>
+          ))}
+        </select>
+      </div>
 
-<div className="mb-6 flex items-center space-x-4">
-  <label htmlFor="category-select" className="w-1/3 font-semibold">
-    {t('surprise_step_category')}
-  </label>
-  <select
-    id="category-select"
-    value={selectedCategory}
-    onChange={(e) => {
-      const newCat = e.target.value;
-      setSelectedCategory(newCat);
-      setFormData({});
-      setAnswered({});
-      setQuestionProgress(1);
-    }}
-    className="w-2/3 border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
-  >
-    <option value="">--</option>
-    {categories.map((c) => (
-      <option key={c.slug} value={c.slug}>
-        {c.name}
-      </option>
-    ))}
-  </select>
-</div>
       {selectedCategory && questionSets[selectedCategory] && (
         <>
-{questionSets[selectedCategory]
-  .slice(0, questionProgress)
-  .map((q) => (
-    <div key={q.key} className="mb-4 flex items-center space-x-4">
-      <label className="w-1/3 font-semibold">{q.label}</label>
-      <select
-        value={formData[q.key] || ''}
-        onChange={(e) => handleChange(q.key, e.target.value)}
-        className="w-2/3 border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
-      >
-        <option value="">--</option>
-        {q.options.map((opt) => (
-          <option key={opt.value} value={opt.value}>
-            {opt.label}
-          </option>
-        ))}
-      </select>
-    </div>
-  ))}
+          {questionSets[selectedCategory].slice(0, questionProgress).map((q) => (
+            <div key={q.key} className="mb-4 flex flex-col sm:flex-row sm:items-center sm:space-x-4">
+              <label className="mb-1 sm:mb-0 sm:w-1/3 font-semibold">{q.label}</label>
+              <select
+                value={formData[q.key] || ''}
+                onChange={(e) => handleChange(q.key, e.target.value)}
+                className="sm:w-2/3 border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              >
+                <option value="">--</option>
+                {q.options.map((opt) => (
+                  <option key={opt.value} value={opt.value}>
+                    {opt.label}
+                  </option>
+                ))}
+              </select>
+            </div>
+          ))}
+
           {questionSets[selectedCategory].every((q) => !q.required || answered[q.key]) && (
             <button
               onClick={handleSubmit}

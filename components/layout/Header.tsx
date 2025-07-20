@@ -9,8 +9,6 @@ import { FaBars } from 'react-icons/fa';
 export default function Header() {
   const { t } = useTranslation();
   const {
-    scrollToProductSection,
-    setActiveType,
     setShowSurpriseModal,
   } = useUIContext();
   const router = useRouter();
@@ -20,18 +18,16 @@ export default function Header() {
   const [atTop, setAtTop] = useState(true);
   const scrollTimeout = useRef<NodeJS.Timeout | null>(null);
 
-const handleScrollTo = (type: 'ENTERTAINMENT' | 'CONSUMABLE') => {
-  setActiveType(type);
-  setMenuOpen(false);
+  const handleRouteToCatalogue = (type: 'ENTERTAINMENT' | 'CONSUMABLE') => {
+    setMenuOpen(false);
+    router.push(`/catalogue?type=${type}`);
+  };
 
-  const target = type.toLowerCase(); // 'entertainment' or 'consumable'
-
-  if (window.location.pathname !== '/') {
-    router.push(`/?scrollTo=${target}`);
-  } else {
-    setTimeout(scrollToProductSection, 100);
-  }
-};
+  const handleSurprise = () => {
+    setMenuOpen(false);
+    router.push('/catalogue?type=ENTERTAINMENT');
+    setTimeout(() => setShowSurpriseModal(true), 300);
+  };
 
   useEffect(() => {
     const handleScroll = () => {
@@ -45,10 +41,8 @@ const handleScrollTo = (type: 'ENTERTAINMENT' | 'CONSUMABLE') => {
         return;
       }
 
-      // Hide header immediately on scroll
       setShowHeader(false);
 
-      // Reset timeout
       if (scrollTimeout.current) clearTimeout(scrollTimeout.current);
 
       scrollTimeout.current = setTimeout(() => {
@@ -83,25 +77,22 @@ const handleScrollTo = (type: 'ENTERTAINMENT' | 'CONSUMABLE') => {
         <nav className="hidden sm:flex gap-3 items-center text-sm font-medium">
           <button
             className="text-button px-3 py-1.5 text-xs sm:text-sm"
-            onClick={() => handleScrollTo('ENTERTAINMENT')}
+            onClick={() => handleRouteToCatalogue('ENTERTAINMENT')}
           >
             {t('entertainment')}
           </button>
           <button
             className="text-button px-3 py-1.5 text-xs sm:text-sm"
-            onClick={() => handleScrollTo('CONSUMABLE')}
+            onClick={() => handleRouteToCatalogue('CONSUMABLE')}
           >
             {t('consumables')}
           </button>
-<button
-  className="text-button px-3 py-1.5 text-xs sm:text-sm"
-  onClick={() => {
-    router.push('/?scrollTo=entertainment');
-    setTimeout(() => setShowSurpriseModal(true), 300);
-  }}
->
-  {t('surprise_me')}
-</button>
+          <button
+            className="text-button px-3 py-1.5 text-xs sm:text-sm"
+            onClick={handleSurprise}
+          >
+            {t('surprise_me')}
+          </button>
         </nav>
 
         {/* Mobile hamburger menu */}
@@ -117,28 +108,22 @@ const handleScrollTo = (type: 'ENTERTAINMENT' | 'CONSUMABLE') => {
             <div className="absolute right-0 top-12 bg-white shadow-lg rounded-md border border-neutral-200 w-40 z-50">
               <button
                 className="text-button w-full text-left px-4 py-2 hover:bg-neutral-100 text-sm"
-                onClick={() => handleScrollTo('ENTERTAINMENT')}
+                onClick={() => handleRouteToCatalogue('ENTERTAINMENT')}
               >
                 {t('entertainment')}
               </button>
               <button
                 className="text-button w-full text-left px-4 py-2 hover:bg-neutral-100 text-sm"
-                onClick={() => handleScrollTo('CONSUMABLE')}
+                onClick={() => handleRouteToCatalogue('CONSUMABLE')}
               >
                 {t('consumables')}
               </button>
- <button
-  className="w-full text-left px-4 py-2 hover:bg-neutral-100 text-sm"
-  onClick={() => {
-    router.push('/?scrollTo=entertainment');
-    setTimeout(() => {
-      setShowSurpriseModal(true);
-      setMenuOpen(false);
-    }, 300);
-  }}
->
-  {t('surprise_me')}
-</button>
+              <button
+                className="text-button w-full text-left px-4 py-2 hover:bg-neutral-100 text-sm"
+                onClick={handleSurprise}
+              >
+                {t('surprise_me')}
+              </button>
             </div>
           )}
         </div>

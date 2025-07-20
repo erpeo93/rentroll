@@ -3,9 +3,9 @@
 import { useRef, Suspense } from 'react';
 import HeroSection from '../components/HeroSection';
 import ProductCarousel from '../components/ProductCarousel';
-import ProductSearchSection from '../components/ProductSearchSection';
+import CatalogueBanner from '../components/CatalogueBanner';
 import { useUIContext } from '@/lib/UIContext';
-import HomeSearchHandler from '../components/HomeSearchHandler';
+import Footer from '../components/layout/Footer';
 
 export default function HomePage() {
   const { activeType, setActiveType } = useUIContext();
@@ -19,18 +19,9 @@ export default function HomePage() {
         }}
       />
       <ProductCarousel />
+      <CatalogueBanner />
 
-      {/* Use Suspense for reading URL search params */}
-      <Suspense fallback={null}>
-        <HomeSearchHandler catalogRef={catalogRef} />
-      </Suspense>
-
-      <div ref={catalogRef}>
-        <ProductSearchSection
-          activeType={activeType}
-          setActiveType={setActiveType}
-        />
-      </div>
+      <Footer />
     </main>
   );
 }
