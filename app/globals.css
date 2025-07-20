@@ -31,10 +31,18 @@ body, html {
   overflow-x: hidden;
 }
 
-button:not(.text-button, .carousel-arrow) {
+button:not(.text-button, .carousel-arrow, .btn-discovery) {
   @apply inline-flex items-center justify-center px-5 py-2.5 rounded-full 
     bg-neutral-900 text-white text-sm font-medium transition 
     hover:bg-neutral-800 focus:outline-none focus:ring-2 
+    focus:ring-offset-2 focus:ring-neutral-500 shadow-sm;
+    @apply cursor-pointer;
+}
+
+.btn-discovery {
+  @apply inline-flex items-center justify-center px-5 py-2.5 rounded-full 
+    bg-gray-100 text-black text-sm font-medium transition 
+    hover:bg-neutral-100 focus:outline-none focus:ring-2 
     focus:ring-offset-2 focus:ring-neutral-500 shadow-sm;
     @apply cursor-pointer;
 }

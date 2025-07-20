@@ -29,9 +29,10 @@ export default function ProductSearchSection({
   const [showSearch, setShowSearch] = useState(false);
   const [showFiltersDropdown, setShowFiltersDropdown] = useState(false);
   const filtersRef = useRef<HTMLDivElement>(null);
+  const searchRef = useRef<HTMLDivElement>(null);
   const hasManuallySelected = useRef(false);
 
-  // Fetch categories for the active type
+  // Fetch categories
   useEffect(() => {
     fetch(`/api/categories?type=${activeType}`)
       .then(res => res.json())
@@ -46,7 +47,7 @@ export default function ProductSearchSection({
       });
   }, [t, activeType]);
 
-  // Fetch products on filters change
+  // Fetch products
   useEffect(() => {
     const q = new URLSearchParams();
     if (search) q.set("name", search);
@@ -68,86 +69,86 @@ export default function ProductSearchSection({
       });
   }, [search, category, activeType]);
 
-  // Close filters dropdown if clicked outside
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
       if (filtersRef.current && !filtersRef.current.contains(event.target as Node)) {
         setShowFiltersDropdown(false);
       }
+      if (searchRef.current && !searchRef.current.contains(event.target as Node)) {
+        setShowSearch(false);
+      }
     }
-    if (showFiltersDropdown) {
-      document.addEventListener('mousedown', handleClickOutside);
-    } else {
-      document.removeEventListener('mousedown', handleClickOutside);
-    }
+    document.addEventListener('mousedown', handleClickOutside);
     return () => {
       document.removeEventListener('mousedown', handleClickOutside);
     };
-  }, [showFiltersDropdown]);
+  }, []);
 
   return (
     <section className="p-8 min-h-[70vh] flex flex-col gap-6 text-gray-100">
-      <div className="w-[95%] sm:w-[60%] bg-gray-600 mx-auto rounded-lg p-6 shadow-md border border-gray-600">
+      <div className="w-[95%] sm:w-[60%] bg-gray-700 mx-auto rounded-lg p-6 shadow-md border border-blue-300">
         <div className="mb-4">
-          <h2 className="text-lg font-semibold">{t('our_catalog')}</h2>
+          <h2 className="text-lg font-semibold text-white">{t('our_catalog')}</h2>
         </div>
 
-        {/* Filters bar */}
-        <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-4 relative">
-
-          {/* Search toggle button */}
+        {/* Top bar */}
+        <div className="flex flex-row flex-wrap items-center justify-center gap-4 mb-4 relative">
+          {/* Search Button */}
           <button
-            className="p-2 rounded-md hover:bg-gray-600 transition"
+            className="p-2 rounded-md hover:bg-gray-200 transition"
             aria-label="Toggle search"
             onClick={() => setShowSearch((v) => !v)}
           >
             <FaSearch size={18} />
           </button>
 
-          {/* Animated search input */}
-          <div
-            className={`overflow-hidden transition-all duration-300 ease-in-out ${showSearch ? 'max-h-40 mt-2' : 'max-h-0'} w-full sm:w-auto`}
-          >
-            <input
-              type="text"
-              value={search}
-              onChange={(e) => {
-                hasManuallySelected.current = false;
-                setSearch(e.target.value);
-              }}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter') {
-                  setSuggestions([]);
-                  hasManuallySelected.current = true;
-                }
-              }}
-              autoComplete="off"
-              placeholder={t('search_placeholder') || 'Search by name'}
-              className="rounded-md border border-gray-500 bg-gray-800 text-gray-100 p-2 w-full sm:w-auto focus:ring-2 focus:ring-indigo-500"
-            />
-            {search.length > 0 && suggestions.length > 0 && (
-              <ul className="bg-gray-800 border border-gray-600 rounded-md max-h-40 overflow-y-auto shadow-sm z-10 mt-1 text-gray-100">
-                {suggestions.map(name => (
-                  <li
-                    key={name}
-                    onClick={() => {
-                      hasManuallySelected.current = true;
-                      setSearch(name);
-                      setSuggestions([]);
-                    }}
-                    className="cursor-pointer px-3 py-1 hover:bg-indigo-700"
-                  >
-                    {name}
-                  </li>
-                ))}
-              </ul>
-            )}
-          </div>
+          {/* Search Modal */}
+          {showSearch && (
+            <div
+              ref={searchRef}
+              className="absolute top-full mt-2 w-full sm:w-72 bg-white border border-gray-300 rounded-md shadow-lg z-50 p-3"
+            >
+              <input
+                type="text"
+                value={search}
+                onChange={(e) => {
+                  hasManuallySelected.current = false;
+                  setSearch(e.target.value);
+                }}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') {
+                    setSuggestions([]);
+                    hasManuallySelected.current = true;
+                  }
+                }}
+                autoComplete="off"
+                placeholder={t('search_placeholder') || 'Search by name'}
+                className="rounded-md border border-gray-400 bg-white text-black p-2 w-full focus:ring-2 focus:ring-indigo-500"
+              />
+              {search.length > 0 && suggestions.length > 0 && (
+                <ul className="bg-white border border-gray-300 rounded-md max-h-40 overflow-y-auto shadow-sm z-10 mt-1 text-black">
+                  {suggestions.map(name => (
+                    <li
+                      key={name}
+                      onClick={() => {
+                        hasManuallySelected.current = true;
+                        setSearch(name);
+                        setSuggestions([]);
+                      }}
+                      className="cursor-pointer px-3 py-1 hover:bg-indigo-100"
+                    >
+                      {name}
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
+          )}
 
-          {/* Filters toggle button */}
+          {/* Filter Toggle */}
           <div className="relative" ref={filtersRef}>
             <button
-              className="ml-auto sm:ml-4 p-2 rounded-md hover:bg-gray-600 transition flex items-center gap-2"
+              className="ml-auto sm:ml-4 p-2 rounded-md hover:bg-gray-200 transition flex items-center gap-2"
               onClick={() => setShowFiltersDropdown((v) => !v)}
               aria-expanded={showFiltersDropdown}
               aria-controls="filters-dropdown"
@@ -159,7 +160,7 @@ export default function ProductSearchSection({
             {showFiltersDropdown && (
               <div
                 id="filters-dropdown"
-                className="absolute right-0 mt-2 w-56 bg-gray-800 border border-gray-600 rounded-md shadow-lg z-50 p-4 flex flex-col gap-4"
+                className="absolute right-0 mt-2 w-56 bg-white border border-gray-300 rounded-md shadow-lg z-50 p-4 flex flex-col gap-4 text-black"
               >
                 <select
                   value={activeType}
@@ -168,8 +169,7 @@ export default function ProductSearchSection({
                     setSearch('');
                     setSuggestions([]);
                   }}
-                  className="filter-select bg-gray-700 text-black border border-gray-600 rounded p-2 w-full"
-                  aria-label="Select product type"
+                  className="bg-gray-100 border border-gray-300 rounded p-2 w-full"
                 >
                   <option value="ENTERTAINMENT">Entertainment</option>
                   <option value="CONSUMABLE">Consumables</option>
@@ -179,7 +179,7 @@ export default function ProductSearchSection({
                   id="category"
                   value={category}
                   onChange={(e) => setCategory(e.target.value)}
-                  className="filter-select bg-gray-700 text-black border border-gray-600 rounded p-2 w-full"
+                  className="bg-gray-100 border border-gray-300 rounded p-2 w-full"
                 >
                   <option value="">{t('all_categories') || 'All Categories'}</option>
                   {categories.map((c) => (
@@ -192,6 +192,7 @@ export default function ProductSearchSection({
             )}
           </div>
 
+          {/* Surprise Me Button */}
           {activeType === 'ENTERTAINMENT' && (
             <button
               onClick={() => setShowSurpriseModal(true)}
@@ -202,34 +203,53 @@ export default function ProductSearchSection({
           )}
         </div>
 
-        {/* Products grid */}
-        <main className="flex flex-wrap gap-6 justify-center">
-          {products.map(product => (
-            <div
-              key={product.id}
-              onClick={() => setSelectedProduct(product)}
-              className="w-full sm:w-1/2 md:w-1/3 lg:w-1/4 xl:w-1/5 2xl:w-1/6 cursor-pointer bg-gray-800 rounded-lg border border-gray-600 p-4 scale-100 hover:scale-105 shadow-sm hover:shadow-md transition flex flex-col justify-between aspect-square transition-transform duration-300"
-            >
-              <img
-                src={'catan.jfif'}
-                alt={product.name}
-                className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105 rounded-md"
-                loading="lazy"
-              />
-              <div className="mt-3">
-                <h3 className="font-semibold text-base sm:text-lg lg:text-lg mb-1 truncate" title={product.name}>
-                  {product.name}
-                </h3>
-                <p className="text-xs sm:text-sm text-gray-400 truncate" title={t(`category_${product.category?.slug}`)}>
-                  {t(`category_${product.category?.slug}`)}
-                </p>
-              </div>
-            </div>
-          ))}
+        {/* Products */}
+        <main className="flex flex-col gap-3">
+{products.map(product => (
+  <div
+    key={product.id}
+    className="w-full bg-white text-gray-900 rounded-lg border border-gray-700 p-4 hover:scale-[1.02] shadow-sm hover:shadow-md transition flex flex-col sm:flex-row gap-4 min-h-[200px]"
+  >
+    {/* Left section: image + info */}
+    <div className="flex flex-col sm:flex-row flex-1 gap-4">
+      <img
+        src="catan.jfif"
+        alt={product.name}
+        className="w-40 h-40 object-cover rounded-md"
+        loading="lazy"
+      />
+      <div className="flex flex-col justify-start">
+        <h3 className="font-semibold text-lg mb-1" title={product.name}>
+          {product.name}
+        </h3>
+        <p className="text-sm text-gray-500" title={t(`category_${product.category?.slug}`)}>
+          {t(`category_${product.category?.slug}`)}
+        </p>
+        <p className="text-sm text-gray-700 mt-2 line-clamp-3">{product.description}</p>
+      </div>
+    </div>
+
+    {/* Right section: buttons aligned to bottom of image */}
+    <div className="flex flex-col justify-end min-w-[140px] h-40">
+      <button
+        className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-md text-sm"
+        onClick={() => setSelectedProduct(product)}
+      >
+        {t('add_to_cart') || 'Add to Cart'}
+      </button>
+      <button
+        className="btn-discovery bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-1.5 rounded-md text-sm mt-2"
+        onClick={() => setSelectedProduct(product)}
+      >
+        {t('discover') || 'Discover'}
+      </button>
+    </div>
+  </div>
+))}
         </main>
       </div>
 
-      {/* Checkout modal */}
+      {/* Checkout Modal */}
       {selectedProduct && (
         <CheckoutModal
           product={selectedProduct}
