@@ -11,28 +11,7 @@ export default function ProductCarousel() {
 
   const carouselRef = useRef<HTMLDivElement>(null);
   const scrollSpeedRef = useRef<number>(1);
-  const [isMobile, setIsMobile] = useState(false);
-
-  // Detect mobile on mount and resize
-  useEffect(() => {
-    function handleResize() {
-      setIsMobile(window.innerWidth < 640); // mobile breakpoint
-    }
-    handleResize();
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
-  }, []);
-
-
-  // Update scroll speed based on mobile or desktop
-  useEffect(() => {
-    if (isMobile) {
-      scrollSpeedRef.current = 3; // faster speed on mobile
-    } else {
-      scrollSpeedRef.current = 1; // default speed on desktop
-    }
-  }, [isMobile]);
-
+  const lastScrollTimeRef = useRef<number>(0);
 
   useEffect(() => {
     fetch('/api/products/hot')
@@ -45,11 +24,22 @@ export default function ProductCarousel() {
     if (!el || products.length === 0) return;
 
     let animationFrame: number;
-    const scrollStep = () => {
-      el.scrollLeft += scrollSpeedRef.current;
-      if (el.scrollLeft >= el.scrollWidth / 2) {
-        el.scrollLeft = 0;
+
+    const scrollStep = (timestamp: number) => {
+      const timeDiff = timestamp - lastScrollTimeRef.current;
+
+      // Scroll every 20ms to slow things down a bit
+      if (timeDiff > 20) {
+        const scrollAmount = el.offsetWidth * 0.0025 * scrollSpeedRef.current; // relative to container width
+        el.scrollLeft += scrollAmount;
+
+        if (el.scrollLeft >= el.scrollWidth / 2) {
+          el.scrollLeft = 0;
+        }
+
+        lastScrollTimeRef.current = timestamp;
       }
+
       animationFrame = requestAnimationFrame(scrollStep);
     };
 
@@ -58,11 +48,11 @@ export default function ProductCarousel() {
   }, [products]);
 
   const handleMouseEnter = () => {
-    scrollSpeedRef.current = isMobile ? 0.5 : 0.5;
+    scrollSpeedRef.current = 0.5;
   };
 
   const handleMouseLeave = () => {
-    scrollSpeedRef.current = isMobile ? 3 : 1;
+    scrollSpeedRef.current = 1;
   };
 
   const touchStartX = useRef<number | null>(null);
@@ -70,10 +60,15 @@ export default function ProductCarousel() {
     touchStartX.current = e.touches[0].clientX;
   };
   const handleTouchEnd = (e: React.TouchEvent) => {
-    if (touchStartX.current !== null) {
+    if (touchStartX.current !== null && carouselRef.current) {
       const diff = touchStartX.current - e.changedTouches[0].clientX;
-      if (diff > 50) carouselRef.current?.scrollBy({ left: 300, behavior: 'smooth' });
-      else if (diff < -50) carouselRef.current?.scrollBy({ left: -300, behavior: 'smooth' });
+      const scrollAmount = carouselRef.current.offsetWidth * 0.5;
+
+      if (diff > 50) {
+        carouselRef.current.scrollBy({ left: scrollAmount, behavior: 'smooth' });
+      } else if (diff < -50) {
+        carouselRef.current.scrollBy({ left: -scrollAmount, behavior: 'smooth' });
+      }
     }
     touchStartX.current = null;
   };

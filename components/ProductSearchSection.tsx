@@ -38,7 +38,7 @@ export default function ProductSearchSection({
       return;
     }
 
-    addItem({ id: product.id, name: product.name });
+    addItem({ id: product.id, name: product.name, image : product.image, description : product.description });
     animatingProducts.current.add(product.id);
     setButtonStates((prev) => ({
       ...prev,
@@ -266,7 +266,7 @@ export default function ProductSearchSection({
                 <button
                   onClick={() => handleAddToCart(product)}
                   disabled={buttonStates[product.id] === 'added'}
-                  className={`py-2 px-4 rounded-md font-semibold transition flex items-center justify-center min-w-[120px]
+                  className={`max-h-10 flex-1 min-w-[40%] text-sm py-2 px-4 rounded-md font-semibold transition flex items-center justify-center min-w-[120px]
                     ${
                       buttonStates[product.id] === 'default'
                         ? 'bg-gray-600 hover:bg-gray-700 text-white cursor-pointer'
@@ -289,7 +289,7 @@ export default function ProductSearchSection({
                   onClick={() => {
                     setSelectedProduct(product);
                   }}
-                  className="btn-discovery py-2 px-4 min-w-[120px] rounded-md font-semibold border border-indigo-600 text-indigo-600 hover:bg-indigo-600 hover:text-white transition flex justify-center"
+                  className="max-h-10 flex-1 min-w-[40%] text-sm btn-discovery py-2 px-4 min-w-[120px] rounded-md font-semibold border border-indigo-600 text-indigo-600 hover:bg-indigo-600 hover:text-white transition flex justify-center"
                 >
                   Discover
                 </button>
