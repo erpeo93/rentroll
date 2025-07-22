@@ -3,120 +3,82 @@
 import { useState, useEffect, useRef } from 'react';
 import { useTranslation } from '../lib/i18n';
 import CheckoutModal from './modal/CheckoutModal';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
 
 export default function ProductCarousel() {
   const { t } = useTranslation();
   const [products, setProducts] = useState<any[]>([]);
   const [selectedProduct, setSelectedProduct] = useState<any | null>(null);
 
-  // References to carousel container and first product card
   const carouselRef = useRef<HTMLDivElement>(null);
-  const productRef = useRef<HTMLDivElement>(null);
+  const scrollSpeedRef = useRef<number>(1);
 
-  // Track current product index shown (0-based)
-  const [currentIndex, setCurrentIndex] = useState(0);
-
-  // Fetch hot products
   useEffect(() => {
     fetch('/api/products/hot')
       .then((res) => res.json())
       .then(setProducts);
   }, []);
 
-  const totalProducts = products.length;
+  useEffect(() => {
+    const el = carouselRef.current;
+    if (!el || products.length === 0) return;
 
-  // Scroll to product by index
-  const scrollToIndex = (index: number) => {
-    if (!carouselRef.current || !productRef.current) return;
+    let animationFrame: number;
+    const scrollStep = () => {
+      el.scrollLeft += scrollSpeedRef.current;
+      if (el.scrollLeft >= el.scrollWidth / 2) {
+        el.scrollLeft = 0;
+      }
+      animationFrame = requestAnimationFrame(scrollStep);
+    };
 
-    const cardWidth = productRef.current.offsetWidth + 24; // product width + gap (gap-6 = 1.5rem = 24px)
+    animationFrame = requestAnimationFrame(scrollStep);
+    return () => cancelAnimationFrame(animationFrame);
+  }, [products]);
 
-    const scrollPosition = cardWidth * index;
-    carouselRef.current.scrollTo({ left: scrollPosition, behavior: 'smooth' });
+  const handleMouseEnter = () => {
+    scrollSpeedRef.current = 0.5;
   };
 
-  // Scroll one product left
-  const prev = () => {
-    const newIndex = Math.max(currentIndex - 1, 0);
-    setCurrentIndex(newIndex);
-    scrollToIndex(newIndex);
+  const handleMouseLeave = () => {
+    scrollSpeedRef.current = 1;
   };
 
-  // Scroll one product right
-  const next = () => {
-    const newIndex = Math.min(currentIndex + 1, totalProducts - 1);
-    setCurrentIndex(newIndex);
-    scrollToIndex(newIndex);
-  };
-
-  // Touch handlers for swipe
   const touchStartX = useRef<number | null>(null);
-
   const handleTouchStart = (e: React.TouchEvent) => {
     touchStartX.current = e.touches[0].clientX;
   };
-
   const handleTouchEnd = (e: React.TouchEvent) => {
     if (touchStartX.current !== null) {
       const diff = touchStartX.current - e.changedTouches[0].clientX;
-      if (diff > 50) next();
-      else if (diff < -50) prev();
+      if (diff > 50) carouselRef.current?.scrollBy({ left: 300, behavior: 'smooth' });
+      else if (diff < -50) carouselRef.current?.scrollBy({ left: -300, behavior: 'smooth' });
     }
     touchStartX.current = null;
   };
 
-  // Sync currentIndex when user manually scrolls the carousel (optional)
-  useEffect(() => {
-    const el = carouselRef.current;
-    if (!el || !productRef.current) return;
-
-    const cardWidth = productRef.current.offsetWidth + 24;
-
-    const onScroll = () => {
-      const scrollLeft = el.scrollLeft;
-      const index = Math.round(scrollLeft / cardWidth);
-      if (index !== currentIndex) setCurrentIndex(index);
-    };
-
-    el.addEventListener('scroll', onScroll, { passive: true });
-
-    return () => el.removeEventListener('scroll', onScroll);
-  }, [currentIndex]);
-
-    return (
+  return (
     <>
       <section
         className="relative w-full h-[50vh] overflow-hidden bg-neutral-100 px-6 flex items-center"
         onTouchStart={handleTouchStart}
         onTouchEnd={handleTouchEnd}
       >
-        {/* Arrows */}
-        <button
-          className="carousel-arrow hidden md:flex absolute left-4 top-1/2 transform -translate-y-1/2 z-20 text-white p-2 rounded-full"
-          onClick={prev}
-          aria-label={t('previous')}
-        >
-          <ChevronLeft size={28} />
-        </button>
-        <button
-          className="carousel-arrow hidden md:flex absolute right-4 top-1/2 transform -translate-y-1/2 z-20 text-white p-2 rounded-full"
-          onClick={next}
-          aria-label={t('next')}
-        >
-          <ChevronRight size={28} />
-        </button>
+        {/* Left gradient */}
+        <div className="pointer-events-none absolute left-0 top-0 h-full w-10 bg-gradient-to-r from-neutral-100 to-transparent z-10" />
+        {/* Right gradient */}
+        <div className="pointer-events-none absolute right-0 top-0 h-full w-10 bg-gradient-to-l from-neutral-100 to-transparent z-10" />
 
-        {/* Carousel Track */}
         <div
           ref={carouselRef}
-          className="w-full overflow-x-auto scroll-smooth no-scrollbar flex gap-6 snap-x snap-mandatory scroll-pl-6 pr-6"
+          className="w-full overflow-x-auto scroll-smooth no-scrollbar flex gap-1 pr-6 group"
+          onMouseEnter={handleMouseEnter}
+          onMouseLeave={handleMouseLeave}
         >
-          {products.map((product, i) => (
+          {[...products, ...products].map((product, i) => (
             <div
-              key={product.id}
-              ref={i === 0 ? productRef : null}
-              className="flex-shrink-0 w-full sm:w-1/2 md:w-1/3 lg:w-1/4 cursor-pointer snap-center scale-90 hover:scale-95 transition-transform"
+              key={`${product.id}-${i}`}
+              className="flex-shrink-0 w-full sm:w-1/2 md:w-1/3 lg:w-1/4 cursor-pointer scale-90 hover:scale-95 transition-transform duration-300 
+                         group-hover:opacity-40 hover:opacity-100"
               onClick={() => setSelectedProduct(product)}
             >
               <div className="border border-gray-300 rounded-2xl shadow-md hover:shadow-xl transition-shadow duration-300 bg-white">
