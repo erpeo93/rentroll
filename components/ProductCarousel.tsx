@@ -30,7 +30,7 @@ export default function ProductCarousel() {
       const timeDiff = timestamp - lastScrollTimeRef.current;
 
       if (timeDiff > 20) {
-	const baseSpeedFactor = 2000; // tweak this number for speed scaling
+	const baseSpeedFactor = 1500; // tweak this number for speed scaling
 	const scrollAmount = baseSpeedFactor / el.offsetWidth * scrollSpeedRef.current;
         el.scrollLeft += scrollAmount;
 
@@ -50,7 +50,7 @@ export default function ProductCarousel() {
   }, [products]);
 
   const handleMouseEnter = () => {
-    scrollSpeedRef.current = 0.2;
+    scrollSpeedRef.current = 0.5;
   };
 
   const handleMouseLeave = () => {

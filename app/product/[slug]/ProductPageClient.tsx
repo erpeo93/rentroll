@@ -3,6 +3,7 @@
 import { useCart } from '@/lib/cart-context';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
+import Footer from '@/components/layout/Footer';
 
 // Dummy static content
 const SECONDARY_IMAGES = ['/example-2.jfif', '/example-3.jfif', '/example-4.jfif'];
@@ -87,6 +88,8 @@ export default function ProductPageClient({ slug }: Props) {
       >
         Add to Cart
       </button>
+<Footer />
     </div>
+
   );
 }
