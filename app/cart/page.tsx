@@ -30,7 +30,7 @@ export default function CartPage() {
                 <li key={item.id} className="py-4 flex gap-4 items-center">
                   {/* Thumbnail */}
                   <img
-                    src={item.image || '/placeholder.jpg'}
+                    src="catan.jfif"
                     alt={item.name}
                     className="w-20 h-20 object-cover rounded-xl border"
                   />

@@ -137,7 +137,7 @@ export default function ProductSearchSection({
   return (
     <section className="p-0 min-h-[70vh] flex flex-col gap-6 text-gray-100">
       {/* Widened container on small and medium screens */}
-      <div className="w-[100%] lg:w-[80%] bg-gray-700 mx-auto rounded-lg p-6 shadow-md border border-blue-300">
+      <div className="w-[100%] lg:w-[80%] bg-gray-700/70 mx-auto rounded-lg p-6 shadow-md border">
         <div className="mb-4">
           <h2 className="text-lg font-semibold text-white">{t('our_catalog')}</h2>
         </div>
@@ -246,7 +246,7 @@ export default function ProductSearchSection({
           {products.map((product) => (
             <div
               key={product.id}
-              className="w-full bg-white text-gray-900 rounded-lg border border-gray-700 p-4 hover:scale-[1.001] shadow-sm hover:shadow-md transition flex flex-col md:flex-row gap-4 min-h-[200px] items-stretch"
+              className="w-full bg-white text-gray-900 rounded-lg border border-black p-4 hover:scale-[1.001] shadow-sm hover:shadow-md transition flex flex-col md:flex-row gap-4 min-h-[200px] items-stretch"
             >
               <div className="flex flex-col md:flex-row flex-1 gap-4 min-w-0">
                 <img
@@ -287,7 +287,7 @@ export default function ProductSearchSection({
 
                 <button
                   onClick={() => router.push(`/product/${product.id}`)}
-                  className="max-h-10 flex-1 min-w-[40%] text-sm btn-discovery py-2 px-4 min-w-[120px] rounded-md font-semibold border border-indigo-600 text-indigo-600 hover:bg-indigo-600 hover:text-white transition flex justify-center"
+                  className="max-h-10 flex-1 min-w-[40%] text-sm btn-discovery py-2 px-4 min-w-[120px] rounded-md font-semibold border border-black text-indigo-600 hover:bg-indigo-600 hover:text-white transition flex justify-center"
                 >
                   Discover
                 </button>

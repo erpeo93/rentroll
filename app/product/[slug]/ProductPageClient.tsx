@@ -1,6 +1,6 @@
 'use client';
 
-import { useCart} from '@/lib/cart-context';
+import { useCart } from '@/lib/cart-context';
 import { useRouter } from 'next/navigation';
 import { useState, useEffect } from 'react';
 import Footer from '@/components/layout/Footer';
@@ -27,7 +27,7 @@ export default function ProductPageClient({ slug }: Props) {
       })
       .then((data) => {
         setProduct(data);
-        setMainImage(data.imageUrl || '/fallback.jpg');
+        setMainImage("/catan.jfif");
       })
       .catch((err) => setError(err.message))
       .finally(() => setLoading(false));
@@ -55,24 +55,29 @@ export default function ProductPageClient({ slug }: Props) {
     return <div className="p-6 text-center text-red-600">Error: {error || 'Product not found'}</div>;
   }
 
-  const SECONDARY_IMAGES = ['/example-2.jfif', '/example-3.jfif', '/example-4.jfif'];
+  const SECONDARY_IMAGES = ['/catan.jfif', '/catan.jfif', '/catan.jfif'];
   const bulletPoints = product.bulletPoints || [];
   const inCart = isInCart(product.id);
 
   return (
-    <div className="max-w-4xl mx-auto p-6">
-      <button onClick={() => router.push('/catalogue')} className="inline-flex items-center gap-2 mb-6 text-blue-600 hover:underline">
+    <div className = "max-w-4xl mx-auto p-6">
+      <button
+        onClick={() => router.push('/catalogue')}
+        className="inline-flex items-center gap-2 mb-6 text-blue-600 hover:underline"
+      >
         <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7"></path>
         </svg>
         Go back to catalogue
       </button>
-
+    <div className="max-w-4xl mx-auto p-6 border border-black rounded-lg">
+      {/* Added border & rounded corners to this main container */}
+    <div>
       <h1 className="text-3xl font-bold mb-2">{product.name}</h1>
       <p className="text-gray-700 mb-6">{product.description}</p>
 
       <div className="mb-4 rounded-xl overflow-hidden border border-gray-300 max-h-[400px]">
-        <img src={mainImage!} alt={product.name} className="w-full h-auto object-cover" />
+        <img src="/catan.jfif" alt={product.name} className="w-full h-auto object-cover" />
       </div>
 
       <div className="flex gap-4 overflow-x-auto pb-4 mb-8">
@@ -84,7 +89,7 @@ export default function ProductPageClient({ slug }: Props) {
               img === mainImage ? 'border-blue-600' : 'border-transparent'
             }`}
           >
-            <img src={img} alt={`thumb-${i}`} className="w-full h-full object-cover" />
+            <img src="/catan.jfif" alt={`thumb-${i}`} className="w-full h-full object-cover" />
           </button>
         ))}
       </div>
@@ -124,9 +129,7 @@ export default function ProductPageClient({ slug }: Props) {
 
       <div className="max-w-xs w-full">
         <button
-          onClick={
-            inCart && !justAdded ? () => router.push('/cart') : handleAddToCart
-          }
+          onClick={inCart && !justAdded ? () => router.push('/cart') : handleAddToCart}
           className={`px-6 py-3 rounded-md text-white w-full transition-all duration-300 flex items-center justify-center gap-2 ${
             justAdded
               ? 'bg-green-600'
@@ -144,11 +147,7 @@ export default function ProductPageClient({ slug }: Props) {
                 strokeWidth="2"
                 viewBox="0 0 24 24"
               >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M5 13l4 4L19 7"
-                />
+                <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
               </svg>
               Added to Cart
             </>
@@ -174,8 +173,9 @@ export default function ProductPageClient({ slug }: Props) {
           )}
         </button>
       </div>
-
-      <Footer />
+      </div>
     </div>
+      <Footer />
+</div>
   );
 }
