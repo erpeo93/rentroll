@@ -18,7 +18,7 @@ export default function CartPage() {
 
   return (
     <div className="px-4 py-10 flex justify-center">
-      <div className="w-full max-w-3xl border border-black rounded-xl p-6 bg-white shadow-sm">
+      <div className="w-full max-w-3xl rounded-xl p-6 bg-neutral-100 shadow-sm">
         <h1 className="text-2xl font-bold mb-6">Your Cart</h1>
 
         {items.length === 0 ? (

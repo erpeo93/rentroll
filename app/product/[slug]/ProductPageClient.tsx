@@ -70,7 +70,7 @@ export default function ProductPageClient({ slug }: Props) {
         </svg>
         Go back to catalogue
       </button>
-    <div className="max-w-4xl mx-auto p-6 border border-black rounded-lg">
+    <div className="max-w-4xl mx-auto p-6 rounded-lg bg-neutral-100 shadow-sm hover:shadow-md">
       {/* Added border & rounded corners to this main container */}
     <div>
       <h1 className="text-3xl font-bold mb-2">{product.name}</h1>

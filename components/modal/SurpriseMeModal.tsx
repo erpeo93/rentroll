@@ -189,23 +189,27 @@ const handleSubmit = async () => {
 
       {selectedCategory && questionSets[selectedCategory] && (
         <>
-          {questionSets[selectedCategory].slice(0, questionProgress).map((q) => (
-            <div key={q.key} className="mb-4 flex flex-col sm:flex-row sm:items-center sm:space-x-4">
-              <label className="mb-1 sm:mb-0 sm:w-1/3 font-semibold">{q.label}</label>
-              <select
-                value={formData[q.key] || ''}
-                onChange={(e) => handleChange(q.key, e.target.value)}
-                className="sm:w-2/3 border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
-              >
-                <option value="">--</option>
-                {q.options.map((opt) => (
-                  <option key={opt.value} value={opt.value}>
-                    {opt.label}
-                  </option>
-                ))}
-              </select>
-            </div>
+<ul className="divide-y divide-gray-300">
+  {questionSets[selectedCategory].slice(0, questionProgress).map((q) => (
+    <li key={q.key} className="py-4">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:space-x-4">
+        <label className="mb-1 sm:mb-0 sm:w-1/3 font-semibold">{q.label}</label>
+        <select
+          value={formData[q.key] || ''}
+          onChange={(e) => handleChange(q.key, e.target.value)}
+          className="sm:w-2/3 border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+        >
+          <option value="">--</option>
+          {q.options.map((opt) => (
+            <option key={opt.value} value={opt.value}>
+              {opt.label}
+            </option>
           ))}
+        </select>
+      </div>
+    </li>
+  ))}
+</ul>
 
           {questionSets[selectedCategory].every((q) => !q.required || answered[q.key]) && (
             <button

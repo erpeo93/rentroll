@@ -137,9 +137,9 @@ export default function ProductSearchSection({
   return (
     <section className="p-0 min-h-[70vh] flex flex-col gap-6 text-gray-100">
       {/* Widened container on small and medium screens */}
-      <div className="w-[100%] lg:w-[80%] bg-gray-700/70 mx-auto rounded-lg p-6 shadow-md border">
+      <div className="w-[100%] lg:w-[80%] bg-neutral-100 mx-auto rounded-lg p-6 shadow-md border">
         <div className="mb-4">
-          <h2 className="text-lg font-semibold text-white">{t('our_catalog')}</h2>
+          <h1 className="text-lg font-semibold text-black">{t('our_catalog')}</h1>
         </div>
 
         <div className="flex flex-row flex-wrap items-center justify-center gap-4 mb-4 relative">
@@ -246,7 +246,7 @@ export default function ProductSearchSection({
           {products.map((product) => (
             <div
               key={product.id}
-              className="w-full bg-white text-gray-900 rounded-lg border border-black p-4 hover:scale-[1.001] shadow-sm hover:shadow-md transition flex flex-col md:flex-row gap-4 min-h-[200px] items-stretch"
+              className="w-full bg-white text-gray-900 rounded-lg p-4 hover:scale-[1.001] shadow-sm hover:shadow-md transition flex flex-col md:flex-row gap-4 min-h-[200px] items-stretch"
             >
               <div className="flex flex-col md:flex-row flex-1 gap-4 min-w-0">
                 <img
