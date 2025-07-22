@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useCart } from '@/lib/cart-context';
 import CheckoutModal from '@/components/modal/CheckoutModal';
+import Footer from '../../components/layout/Footer';
 
 export default function CartPage() {
   const { items, updateQuantity, clearCart } = useCart();
@@ -17,6 +18,7 @@ export default function CartPage() {
   };
 
   return (
+<main className="px-4">
     <div className="px-4 py-10 flex justify-center">
       <div className="w-full max-w-3xl rounded-xl p-6 bg-neutral-100 shadow-sm">
         <h1 className="text-2xl font-bold mb-6">Your Cart</h1>
@@ -91,5 +93,7 @@ export default function CartPage() {
         )}
       </div>
     </div>
+<Footer / >
+</main>
   );
 }
