@@ -68,7 +68,8 @@ export default function ProductCarousel() {
         {/* Carousel */}
         <div
           ref={carouselRef}
-          className="w-full overflow-x-auto scroll-smooth no-scrollbar flex gap-1 pr-6 group"
+          className="w-full overflow-x-hidden scroll-smooth no-scrollbar flex gap-1 pr-6 group"
+style={{ touchAction: 'none' }}
           onMouseEnter={handleMouseEnter}
           onMouseLeave={handleMouseLeave}
         >
