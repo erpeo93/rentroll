@@ -26,24 +26,27 @@ export default function ProductSearchSection({
   const [categories, setCategories] = useState<{ slug: string; name: string }[]>([]);
   const router = useRouter();
   const { setShowSurpriseModal } = useUIContext();
-  const { addItem } = useCart();
+  const { addItem, items } = useCart();
 
   const [buttonStates, setButtonStates] = useState<Record<string, 'default' | 'added' | 'goToCart'>>({});
+  const animatingProducts = useRef<Set<string>>(new Set());
 
   const handleAddToCart = (product: any) => {
-    if (buttonStates[product.id] === 'goToCart') {
-      router.push('/cart'); // Or trigger cart modal, depending on app
+    const currentState = buttonStates[product.id];
+    if (currentState === 'goToCart') {
+      router.push('/cart');
       return;
     }
 
     addItem({ id: product.id, name: product.name });
-
+    animatingProducts.current.add(product.id);
     setButtonStates((prev) => ({
       ...prev,
       [product.id]: 'added',
     }));
 
     setTimeout(() => {
+      animatingProducts.current.delete(product.id);
       setButtonStates((prev) => ({
         ...prev,
         [product.id]: 'goToCart',
@@ -58,30 +61,32 @@ export default function ProductSearchSection({
   const searchButtonRef = useRef<HTMLButtonElement>(null);
   const hasManuallySelected = useRef(false);
 
+  // Update categories on activeType change
   useEffect(() => {
     fetch(`/api/categories?type=${activeType}`)
-      .then(res => res.json())
-      .then(data => {
+      .then((res) => res.json())
+      .then((data) => {
         setCategories(
           data.map((c: any) => ({
             slug: c.slug,
-            name: t(`category_${c.slug}`) || c.name
+            name: t(`category_${c.slug}`) || c.name,
           }))
         );
         setCategory('');
       });
   }, [t, activeType]);
 
+  // Update products and suggestions on search/category/type change
   useEffect(() => {
     const q = new URLSearchParams();
-    if (search) q.set("name", search);
-    if (category) q.set("category", category);
-    if (activeType) q.set("type", activeType);
+    if (search) q.set('name', search);
+    if (category) q.set('category', category);
+    if (activeType) q.set('type', activeType);
 
     const url = `/api/products?${q.toString()}`;
     fetch(url)
-      .then(res => res.json())
-      .then(data => {
+      .then((res) => res.json())
+      .then((data) => {
         setProducts(data);
         if (!hasManuallySelected.current && search) {
           const uniqueNames = Array.from(new Set(data.map((p: any) => p.name))) as string[];
@@ -92,6 +97,7 @@ export default function ProductSearchSection({
       });
   }, [search, category, activeType]);
 
+  // Click outside handlers to close dropdowns
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
       if (filtersRef.current && !filtersRef.current.contains(event.target as Node)) {
@@ -112,9 +118,26 @@ export default function ProductSearchSection({
     };
   }, []);
 
+  // Sync button states based on cart contents and products, but skip products currently animating
+  useEffect(() => {
+    if (!products) return; // safeguard
+    setButtonStates((prev) => {
+      const newStates = { ...prev };
+      const citems = items ?? []; // fallback to empty array if undefined
+      for (const product of products) {
+        const inCart = citems.some((item) => item.id === product.id);
+        if (!animatingProducts.current.has(product.id)) {
+          newStates[product.id] = inCart ? 'goToCart' : 'default';
+        }
+      }
+      return newStates;
+    });
+  }, [items, products]);
+
   return (
     <section className="p-8 min-h-[70vh] flex flex-col gap-6 text-gray-100">
-      <div className="w-[95%] sm:w-[60%] bg-gray-700 mx-auto rounded-lg p-6 shadow-md border border-blue-300">
+      {/* Widened container on small and medium screens */}
+      <div className="w-[100%] lg:w-[80%] bg-gray-700 mx-auto rounded-lg p-6 shadow-md border border-blue-300">
         <div className="mb-4">
           <h2 className="text-lg font-semibold text-white">{t('our_catalog')}</h2>
         </div>
@@ -151,7 +174,7 @@ export default function ProductSearchSection({
               />
               {search.length > 0 && suggestions.length > 0 && (
                 <ul className="bg-white border border-gray-300 rounded-md max-h-40 overflow-y-auto shadow-sm mt-1 text-black">
-                  {suggestions.map(name => (
+                  {suggestions.map((name) => (
                     <li
                       key={name}
                       onClick={() => {
@@ -220,10 +243,10 @@ export default function ProductSearchSection({
         </div>
 
         <main className="flex flex-col gap-3">
-          {products.map(product => (
+          {products.map((product) => (
             <div
               key={product.id}
-              className="w-full bg-white text-gray-900 rounded-lg border border-gray-700 p-4 hover:scale-[1.02] shadow-sm hover:shadow-md transition flex flex-col md:flex-row gap-4 min-h-[200px] items-stretch"
+              className="w-full bg-white text-gray-900 rounded-lg border border-gray-700 p-4 hover:scale-[1.001] shadow-sm hover:shadow-md transition flex flex-col md:flex-row gap-4 min-h-[200px] items-stretch"
             >
               <div className="flex flex-col md:flex-row flex-1 gap-4 min-w-0">
                 <img
@@ -234,58 +257,54 @@ export default function ProductSearchSection({
                 />
                 <div className="flex flex-col justify-start">
                   <h3 className="font-semibold text-lg mb-1">{product.name}</h3>
-                  <p className="text-sm text-gray-500">
-                    {t(`category_${product.category?.slug}`)}
-                  </p>
+                  <p className="text-sm text-gray-500">{t(`category_${product.category?.slug}`)}</p>
                   <p className="text-sm text-gray-700 mt-2 line-clamp-3">{product.description}</p>
                 </div>
               </div>
 
-              <div className="flex gap-2 mt-4 md:mt-0 md:flex-col md:justify-end md:items-end min-w-[140px] flex-shrink-0">
-                <div className="w-32 md:w-full flex gap-2 md:flex-col">
-                  <button
-                    className={`w-full px-4 py-2 rounded-md text-sm text-white whitespace-nowrap transition flex items-center justify-center gap-2
-                      ${
-                        buttonStates[product.id] === 'added'
-                          ? 'bg-green-700'
-                          : buttonStates[product.id] === 'goToCart'
-                          ? 'bg-blue-600 hover:bg-blue-700'
-                          : 'bg-green-600 hover:bg-green-700'
-                      }
-                    `}
-                    onClick={() => handleAddToCart(product)}
-                  >
-                    {buttonStates[product.id] === 'added' ? (
-                      <>
-                        <FaCheck /> {t('added') || 'Added'}
-                      </>
-                    ) : buttonStates[product.id] === 'goToCart' ? (
-                      t('go_to_cart') || 'Go to Cart'
-                    ) : (
-                      t('add_to_cart') || 'Add to Cart'
-                    )}
-                  </button>
+              <div className="flex gap-2 mt-4 md:mt-0 md:flex-col md:justify-end md:items-end min-w-[140px]">
+                <button
+                  onClick={() => handleAddToCart(product)}
+                  disabled={buttonStates[product.id] === 'added'}
+                  className={`py-2 px-4 rounded-md font-semibold transition flex items-center justify-center min-w-[120px]
+                    ${
+                      buttonStates[product.id] === 'default'
+                        ? 'bg-gray-600 hover:bg-gray-700 text-white cursor-pointer'
+                        : buttonStates[product.id] === 'added'
+                        ? 'bg-green-600 cursor-default text-white'
+                        : 'bg-indigo-600 hover:bg-indigo-700 text-white'
+                    }
+                  `}
+                >
+                  {buttonStates[product.id] === 'default' && 'Add to Cart'}
+                  {buttonStates[product.id] === 'added' && (
+                    <>
+                      <FaCheck className="mr-2" /> Added!
+                    </>
+                  )}
+                  {buttonStates[product.id] === 'goToCart' && 'Go to Cart'}
+                </button>
 
-                  <button
-                    className="btn-discovery bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-1.5 rounded-md text-sm whitespace-nowrap w-full"
-                    onClick={() => setSelectedProduct(product)}
-                  >
-                    {t('discover') || 'Discover'}
-                  </button>
-                </div>
+                <button
+                  onClick={() => {
+                    setSelectedProduct(product);
+                  }}
+                  className="btn-discovery py-2 px-4 min-w-[120px] rounded-md font-semibold border border-indigo-600 text-indigo-600 hover:bg-indigo-600 hover:text-white transition flex justify-center"
+                >
+                  Discover
+                </button>
               </div>
             </div>
           ))}
         </main>
-      </div>
 
-      {selectedProduct && (
-        <CheckoutModal
-          product={selectedProduct}
-          productType={selectedProduct.category?.type || 'ENTERTAINMENT'}
-          onClose={() => setSelectedProduct(null)}
-        />
-      )}
+        {selectedProduct && (
+          <CheckoutModal
+            onClose={() => setSelectedProduct(null)}
+            product={selectedProduct}
+          />
+        )}
+      </div>
     </section>
   );
 }

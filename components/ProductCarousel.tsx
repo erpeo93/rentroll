@@ -11,6 +11,28 @@ export default function ProductCarousel() {
 
   const carouselRef = useRef<HTMLDivElement>(null);
   const scrollSpeedRef = useRef<number>(1);
+  const [isMobile, setIsMobile] = useState(false);
+
+  // Detect mobile on mount and resize
+  useEffect(() => {
+    function handleResize() {
+      setIsMobile(window.innerWidth < 640); // mobile breakpoint
+    }
+    handleResize();
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+
+  // Update scroll speed based on mobile or desktop
+  useEffect(() => {
+    if (isMobile) {
+      scrollSpeedRef.current = 3; // faster speed on mobile
+    } else {
+      scrollSpeedRef.current = 1; // default speed on desktop
+    }
+  }, [isMobile]);
+
 
   useEffect(() => {
     fetch('/api/products/hot')
@@ -36,11 +58,11 @@ export default function ProductCarousel() {
   }, [products]);
 
   const handleMouseEnter = () => {
-    scrollSpeedRef.current = 0.5;
+    scrollSpeedRef.current = isMobile ? 0.5 : 0.5;
   };
 
   const handleMouseLeave = () => {
-    scrollSpeedRef.current = 1;
+    scrollSpeedRef.current = isMobile ? 3 : 1;
   };
 
   const touchStartX = useRef<number | null>(null);
