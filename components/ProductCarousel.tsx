@@ -33,7 +33,7 @@ const { showFAQModal } = useUIContext();
       const timeDiff = timestamp - lastScrollTimeRef.current;
 
       if (timeDiff > 20) {
-	var baseSpeedFactor = 1500.0; // tweak this number for speed scaling
+	var baseSpeedFactor = 1200.0; // tweak this number for speed scaling
 if (showFAQModal  ) baseSpeedFactor = 0;
 	const scrollAmount = baseSpeedFactor / el.offsetWidth * scrollSpeedRef.current;
         el.scrollLeft += scrollAmount;
@@ -83,7 +83,7 @@ style={{ touchAction: 'none' }}
               key={`${product.id}-${i}`}
               className="flex-shrink-0 w-full sm:w-1/2 md:w-1/3 lg:w-1/4 cursor-pointer scale-90 hover:scale-95 transition-transform duration-300 
                          group-hover:opacity-40 hover:opacity-100"
-              onClick={() => router.push(`/product/${product.slug}`)}
+              onClick={() => router.push(`/product/${product.id}`)}
             >
               <div className="border border-gray-300 rounded-2xl shadow-md hover:shadow-xl transition-shadow duration-300 bg-white">
                 <div className="aspect-square rounded-xl overflow-hidden relative">

@@ -150,7 +150,7 @@ const handleSubmit = async () => {
     const random = data[Math.floor(Math.random() * data.length)];
     setShowSurpriseModal(false);
     onClose();
-    router.push(`/product/${random.slug}`);
+    router.push(`/product/${random.id}`);
   } else {
     alert('No matching products found');
     onClose();

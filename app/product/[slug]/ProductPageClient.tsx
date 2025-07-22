@@ -1,6 +1,6 @@
 'use client';
 
-import { useCart } from '@/lib/cart-context';
+import { useCart} from '@/lib/cart-context';
 import { useRouter } from 'next/navigation';
 import { useState, useEffect } from 'react';
 import Footer from '@/components/layout/Footer';
@@ -11,12 +11,13 @@ type Props = {
 
 export default function ProductPageClient({ slug }: Props) {
   const router = useRouter();
-  const { addItem } = useCart();
+  const { addItem, isInCart } = useCart();
 
   const [product, setProduct] = useState<any>(null);
   const [mainImage, setMainImage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
+  const [justAdded, setJustAdded] = useState(false);
 
   useEffect(() => {
     fetch(`/api/products/${slug}`)
@@ -32,6 +33,20 @@ export default function ProductPageClient({ slug }: Props) {
       .finally(() => setLoading(false));
   }, [slug]);
 
+  const handleAddToCart = () => {
+    if (!product) return;
+
+    addItem({
+      id: product.id,
+      name: product.name,
+      description: product.description,
+      image: product.imageUrl,
+    });
+
+    setJustAdded(true);
+    setTimeout(() => setJustAdded(false), 1000);
+  };
+
   if (loading) {
     return <div className="p-6 text-center">Loading...</div>;
   }
@@ -42,6 +57,7 @@ export default function ProductPageClient({ slug }: Props) {
 
   const SECONDARY_IMAGES = ['/example-2.jfif', '/example-3.jfif', '/example-4.jfif'];
   const bulletPoints = product.bulletPoints || [];
+  const inCart = isInCart(product.id);
 
   return (
     <div className="max-w-4xl mx-auto p-6">
@@ -90,30 +106,74 @@ export default function ProductPageClient({ slug }: Props) {
         {product.minPlayers && (
           <div className="flex items-center gap-2 bg-gray-100 rounded-xl px-4 py-2 text-sm font-medium text-gray-700">
             <span>🎲</span>
-            <span>{product.minPlayers}–{product.maxPlayers ?? product.minPlayers} players</span>
+            <span>
+              {product.minPlayers}–{product.maxPlayers ?? product.minPlayers} players
+            </span>
           </div>
         )}
         {product.moodTags?.map((tag: string) => (
-          <div key={tag} className="flex items-center gap-2 bg-gray-100 rounded-xl px-4 py-2 text-sm font-medium text-gray-700">
+          <div
+            key={tag}
+            className="flex items-center gap-2 bg-gray-100 rounded-xl px-4 py-2 text-sm font-medium text-gray-700"
+          >
             <span>🏷️</span>
             <span>{tag}</span>
           </div>
         ))}
       </section>
 
-      <button
-        onClick={() =>
-          addItem({
-            id: product.id,
-            name: product.name,
-            description: product.description,
-            image: product.imageUrl,
-          })
-        }
-        className="bg-blue-600 text-white px-6 py-3 rounded-md hover:bg-blue-700 transition w-full max-w-xs"
-      >
-        Add to Cart
-      </button>
+      <div className="max-w-xs w-full">
+        <button
+          onClick={
+            inCart && !justAdded ? () => router.push('/cart') : handleAddToCart
+          }
+          className={`px-6 py-3 rounded-md text-white w-full transition-all duration-300 flex items-center justify-center gap-2 ${
+            justAdded
+              ? 'bg-green-600'
+              : inCart
+              ? 'bg-green-700 hover:bg-green-800'
+              : 'bg-blue-600 hover:bg-blue-700'
+          }`}
+        >
+          {justAdded ? (
+            <>
+              <svg
+                className="w-5 h-5"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M5 13l4 4L19 7"
+                />
+              </svg>
+              Added to Cart
+            </>
+          ) : inCart ? (
+            <>
+              <svg
+                className="w-5 h-5"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13l-1.5 6h13L17 13M7 13L5.4 5M17 13l1.5 6M9 21a1 1 0 100-2 1 1 0 000 2zm6 0a1 1 0 100-2 1 1 0 000 2z"
+                />
+              </svg>
+              Go to Cart
+            </>
+          ) : (
+            <>Add to Cart</>
+          )}
+        </button>
+      </div>
 
       <Footer />
     </div>
