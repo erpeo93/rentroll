@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useTranslation } from '../lib/i18n';
 import { useRouter } from 'next/navigation';
+import { useUIContext } from '@/lib/UIContext';
 
 export default function ProductCarousel() {
   const { t } = useTranslation();
@@ -11,6 +12,7 @@ export default function ProductCarousel() {
   const carouselRef = useRef<HTMLDivElement>(null);
   const scrollSpeedRef = useRef<number>(1);
   const lastScrollTimeRef = useRef<number>(0);
+const { showFAQModal } = useUIContext();
 
   const router = useRouter();
 
@@ -21,6 +23,7 @@ export default function ProductCarousel() {
   }, []);
 
   useEffect(() => {
+
     const el = carouselRef.current;
     if (!el || products.length === 0) return;
 
@@ -30,7 +33,8 @@ export default function ProductCarousel() {
       const timeDiff = timestamp - lastScrollTimeRef.current;
 
       if (timeDiff > 20) {
-	const baseSpeedFactor = 1500; // tweak this number for speed scaling
+	var baseSpeedFactor = 1500.0; // tweak this number for speed scaling
+if (showFAQModal  ) baseSpeedFactor = 0;
 	const scrollAmount = baseSpeedFactor / el.offsetWidth * scrollSpeedRef.current;
         el.scrollLeft += scrollAmount;
 
@@ -47,7 +51,7 @@ export default function ProductCarousel() {
 
     animationFrame = requestAnimationFrame(scrollStep);
     return () => cancelAnimationFrame(animationFrame);
-  }, [products]);
+  }, [products, showFAQModal]);
 
   const handleMouseEnter = () => {
     scrollSpeedRef.current = 0.5;

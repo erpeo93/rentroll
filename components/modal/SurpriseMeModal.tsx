@@ -5,6 +5,7 @@ import { useTranslation } from '@/lib/i18n';
 import { useCart } from '@/lib/cart-context';
 import { useUIContext } from '@/lib/UIContext';
 import { ModalWrapper } from '@/components/modal/ModalStyles';
+import { useRouter } from 'next/navigation';
 
 type Question = {
   key: string;
@@ -17,6 +18,7 @@ export default function SurpriseMeModal({ onClose }: { onClose: () => void }) {
   const { t } = useTranslation();
   const { addItem } = useCart();
   const { startCheckout, setShowSurpriseModal } = useUIContext();
+const router = useRouter();
 
   const [categories, setCategories] = useState<{ slug: string; name: string }[]>([]);
   const [selectedCategory, setSelectedCategory] = useState('');
@@ -36,6 +38,25 @@ export default function SurpriseMeModal({ onClose }: { onClose: () => void }) {
         );
       });
   }, [t]);
+
+useEffect(() => {
+  const originalOverflow = document.body.style.overflow;
+  const originalHtmlOverflow = document.documentElement.style.overflow;
+
+  document.body.style.overflow = 'hidden';
+  document.documentElement.style.overflow = 'hidden'; // also prevent touch on mobile
+
+  // Optional: disable iOS scroll bounce
+  document.body.style.position = 'fixed';
+  document.body.style.width = '100%';
+
+  return () => {
+    document.body.style.overflow = originalOverflow;
+    document.documentElement.style.overflow = originalHtmlOverflow;
+    document.body.style.position = '';
+    document.body.style.width = '';
+  };
+}, []);
 
   const questionSets: Record<string, Question[]> = {
     'board-game': [
@@ -115,25 +136,26 @@ export default function SurpriseMeModal({ onClose }: { onClose: () => void }) {
     }
   };
 
-  const handleSubmit = async () => {
-    const params = new URLSearchParams({
-      category: selectedCategory,
-      type: 'ENTERTAINMENT',
-      ...formData,
-    });
+const handleSubmit = async () => {
+  const params = new URLSearchParams({
+    category: selectedCategory,
+    type: 'ENTERTAINMENT',
+    ...formData,
+  });
 
-    const res = await fetch(`/api/products?${params.toString()}`);
-    const data = await res.json();
+  const res = await fetch(`/api/products?${params.toString()}`);
+  const data = await res.json();
 
-    if (data.length > 0) {
-      const random = data[Math.floor(Math.random() * data.length)];
-      setShowSurpriseModal(false);
-      startCheckout(random);
-    } else {
-      alert('No matching products found');
-      onClose();
-    }
-  };
+  if (data.length > 0) {
+    const random = data[Math.floor(Math.random() * data.length)];
+    setShowSurpriseModal(false);
+    onClose();
+    router.push(`/product/${random.slug}`);
+  } else {
+    alert('No matching products found');
+    onClose();
+  }
+};
 
   return (
     <ModalWrapper onClose={onClose}>

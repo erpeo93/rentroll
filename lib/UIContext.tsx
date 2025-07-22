@@ -12,6 +12,7 @@ interface UIContextType {
   scrollToProductSection: () => void;
   setActiveType: (type: ProductType) => void;
   activeType: ProductType;
+  showFAQModal : boolean,
   setShowFAQModal: (v: boolean) => void;
   setShowSurpriseModal: (v: boolean) => void;
   startCheckout: (product: Product) => void;
@@ -35,6 +36,7 @@ export function UIProvider({ children }: { children: React.ReactNode }) {
   const [showSurpriseModal, setShowSurpriseModal] = useState(false);
 const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
 const [isCheckoutOpen, setCheckoutOpen] = useState(false);
+const [isModalOpen, setIsModalOpen] = useState(false);
 
 const startCheckout = (product: Product) => {
   setSelectedProduct(product);
@@ -70,6 +72,7 @@ const scrollToProductSection = () => {
         scrollToProductSection,
         setActiveType,
         activeType,
+        showFAQModal,
         setShowFAQModal,
         setShowSurpriseModal,
     startCheckout,

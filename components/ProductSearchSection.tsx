@@ -286,7 +286,7 @@ export default function ProductSearchSection({
                 </button>
 
                 <button
-                  onClick={() => router.push(`/product/${product.slug}`)}
+                  onClick={() => router.push(`/product/${product.id}`)}
                   className="max-h-10 flex-1 min-w-[40%] text-sm btn-discovery py-2 px-4 min-w-[120px] rounded-md font-semibold border border-indigo-600 text-indigo-600 hover:bg-indigo-600 hover:text-white transition flex justify-center"
                 >
                   Discover
