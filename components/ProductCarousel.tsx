@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useTranslation } from '../lib/i18n';
 import CheckoutModal from './modal/CheckoutModal';
+import { useRouter } from 'next/navigation';
 
 export default function ProductCarousel() {
   const { t } = useTranslation();
@@ -12,6 +13,8 @@ export default function ProductCarousel() {
   const carouselRef = useRef<HTMLDivElement>(null);
   const scrollSpeedRef = useRef<number>(1);
   const lastScrollTimeRef = useRef<number>(0);
+
+  const router = useRouter();
 
   useEffect(() => {
     fetch('/api/products/hot')
@@ -96,7 +99,7 @@ export default function ProductCarousel() {
               key={`${product.id}-${i}`}
               className="flex-shrink-0 w-full sm:w-1/2 md:w-1/3 lg:w-1/4 cursor-pointer scale-90 hover:scale-95 transition-transform duration-300 
                          group-hover:opacity-40 hover:opacity-100"
-              onClick={() => setSelectedProduct(product)}
+              onClick={() => router.push(`/product/${product.slug}`)}
             >
               <div className="border border-gray-300 rounded-2xl shadow-md hover:shadow-xl transition-shadow duration-300 bg-white">
                 <div className="aspect-square rounded-xl overflow-hidden relative">
