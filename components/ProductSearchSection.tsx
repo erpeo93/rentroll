@@ -135,7 +135,7 @@ export default function ProductSearchSection({
   }, [items, products]);
 
   return (
-    <section className="p-8 min-h-[70vh] flex flex-col gap-6 text-gray-100">
+    <section className="p-0 min-h-[70vh] flex flex-col gap-6 text-gray-100">
       {/* Widened container on small and medium screens */}
       <div className="w-[100%] lg:w-[80%] bg-gray-700 mx-auto rounded-lg p-6 shadow-md border border-blue-300">
         <div className="mb-4">
