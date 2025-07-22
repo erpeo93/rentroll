@@ -76,7 +76,7 @@ style={{ touchAction: 'none' }}
           {[...products, ...products].map((product, i) => (
             <div
               key={`${product.id}-${i}`}
-              className="flex-shrink-0 w-full sm:w-1/2 md:w-1/3 lg:w-1/4 cursor-pointer scale-90 hover:scale-95 transition-transform duration-300 
+              className="flex-shrink-0 min-w-[150px] sm:w-1/2 md:w-1/3 lg:w-1/4 cursor-pointer scale-90 hover:scale-95 transition-transform duration-300 
                          group-hover:opacity-40 hover:opacity-100"
               onClick={() => router.push(`/product/${product.slug}`)}
             >
