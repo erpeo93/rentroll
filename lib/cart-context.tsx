@@ -1,6 +1,7 @@
 'use client';
 
-import { createContext, useContext, useState, ReactNode } from 'react';
+import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
+import Cookies from 'js-cookie';
 
 export type CartItem = {
   id: string;
@@ -17,13 +18,33 @@ type CartContextType = {
   removeItem: (id: string) => void;
   updateQuantity: (id: string, quantity: number) => void;
   clearCart: () => void;
-  isInCart: (id: string) => boolean; // ✅ added
+  isInCart: (id: string) => boolean;
 };
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
 
+const COOKIE_KEY = 'rentroll_cart';
+
 export function CartProvider({ children }: { children: ReactNode }) {
   const [items, setItems] = useState<CartItem[]>([]);
+
+  // Load cart from cookie on mount
+  useEffect(() => {
+    const saved = Cookies.get(COOKIE_KEY);
+    if (saved) {
+      try {
+        const parsed: CartItem[] = JSON.parse(saved);
+        setItems(parsed);
+      } catch (err) {
+        console.error('Failed to parse cart from cookie', err);
+      }
+    }
+  }, []);
+
+  // Sync cart to cookie whenever it changes
+  useEffect(() => {
+    Cookies.set(COOKIE_KEY, JSON.stringify(items), { expires: 7 }); // 7 days expiry
+  }, [items]);
 
   const addItem = (item: Omit<CartItem, 'quantity'>) => {
     setItems((prev) => {
@@ -54,7 +75,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
 
   const clearCart = () => setItems([]);
 
-  const isInCart = (id: string) => items.some((item) => item.id === id); // ✅ added
+  const isInCart = (id: string) => items.some((item) => item.id === id);
 
   return (
     <CartContext.Provider
