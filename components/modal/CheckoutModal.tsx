@@ -138,7 +138,7 @@ export default function CheckoutModal({ product, productType, startStep, onClose
 
   const handleAddToCart = () => {
     if (product) {
-      addItem({ id: product.id, name: product.name, variant });
+      addItem({ id: product.id, name: product.name, variant, price : 10 });
     }
     onClose();
   };

@@ -38,7 +38,7 @@ export default function ProductSearchSection({
       return;
     }
 
-    addItem({ id: product.id, name: product.name, image : product.image, description : product.description });
+    addItem({ id: product.id, name: product.name, image : product.image, description : product.description, price : 10 });
     animatingProducts.current.add(product.id);
     setButtonStates((prev) => ({
       ...prev,
@@ -139,7 +139,7 @@ export default function ProductSearchSection({
       {/* Widened container on small and medium screens */}
       <div className="w-[100%] lg:w-[80%] bg-neutral-100 mx-auto rounded-lg p-6 shadow-md border">
         <div className="mb-4">
-          <h1 className="text-lg font-semibold text-black">{t('our_catalog')}</h1>
+          <h1 className="text-2xl font-bold mb-6 text-black">{t('our_catalog')}</h1>
         </div>
 
         <div className="flex flex-row flex-wrap items-center justify-center gap-4 mb-4 relative">
