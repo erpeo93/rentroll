@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import Link from 'next/link';
 import { ChevronDown, ChevronUp } from 'lucide-react';
+import Footer from '@/components/layout/Footer';
 
 const VALID_CITIES = ['Milan', 'Rome', 'Florence', 'Turin'];
 
@@ -37,6 +38,7 @@ export default function CheckoutPage() {
   };
 
   return (
+ <main className="px-4">
     <div className="max-w-2xl mx-auto mt-10 p-4 bg-neutral-100 shadow rounded-lg space-y-6">
       <h1 className="text-2xl font-bold">Checkout</h1>
 
@@ -156,5 +158,7 @@ export default function CheckoutPage() {
         Confirm Order
       </button>
     </div>
+<Footer />
+</main>
   );
 }

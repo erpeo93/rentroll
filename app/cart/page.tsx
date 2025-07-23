@@ -17,9 +17,9 @@ export default function CartPage() {
   };
 
   return (
-    <main className="px-4">
-      <div className="px-4 py-10 flex justify-center">
-<div className = "w-full max-w-3xl rounded-xl p-6">
+    <main className="px-0">
+      <div className="px-0 py-10 flex justify-center">
+<div className="w-full max-w-full sm:max-w-3xl rounded-xl p-3">
       <button
         onClick={() => router.push('/catalogue')}
         className="inline-flex items-center gap-2 mb-6"
@@ -29,7 +29,7 @@ export default function CartPage() {
         </svg>
         Go back to catalogue
       </button>
-        <div className="w-full max-w-3xl rounded-xl p-6 bg-neutral-100 shadow-sm">
+        <div className="w-full max-w-full  sm:max-w-3xl rounded-xl p-6 bg-neutral-100 shadow-sm">
           <h1 className="text-2xl font-bold mb-6">Your Cart</h1>
 
           {items.length === 0 ? (
@@ -48,7 +48,7 @@ export default function CartPage() {
 
                     {/* Details */}
                     <div className="flex-1">
-                      <p className="font-semibold text-lg">{item.name}</p>
+                      <p className="font-semibold text-lg word-break">{item.name}</p>
                       {item.description && (
                         <p className="text-sm text-gray-600 mt-1 line-clamp-2">
                           {item.description}
@@ -58,17 +58,17 @@ export default function CartPage() {
 
                     {/* Quantity + Total */}
                     <div className="flex flex-col items-center gap-2">
-                      <div className="flex items-center gap-2">
+                      <div className="flex items-center quantity-control gap-2">
                         <button
                           onClick={() => handleDecrease(item.id, item.quantity)}
-                          className="w-8 h-8 rounded-full bg-gray-200 hover:bg-gray-300 text-xl leading-none"
+                          className="btn-quantity"
                         >
                           –
                         </button>
-                        <span className="text-md w-6 text-center">{item.quantity}</span>
+                        <span className="quantity-label text-md w-6 text-center">{item.quantity}</span>
                         <button
                           onClick={() => updateQuantity(item.id, item.quantity + 1)}
-                          className="w-8 h-8 rounded-full bg-gray-200 hover:bg-gray-300 text-xl leading-none"
+                          className="btn-quantity"
                         >
                           +
                         </button>
