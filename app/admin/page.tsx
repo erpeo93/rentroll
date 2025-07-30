@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic";
+
 import { useState, useEffect } from "react";
 import { PrismaClient, Product, ProductCategory } from "@prisma/client";
 import AdminProductsClient from './AdminProductsClient';
