@@ -54,7 +54,6 @@ export default function HeroSection({ onScrollToCatalog }: Props) {
           </div>
         </div>
       </section>
-      <div className="w-full h-3 bg-white" />
     </>
   );
 }

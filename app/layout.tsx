@@ -1,7 +1,7 @@
 'use client';
 
 import './globals.css';
-import { ReactNode, useState } from 'react';
+import { ReactNode, useState, useEffect } from 'react';
 import { I18nProvider } from '../lib/i18n';
 import { CartProvider, useCart } from '@/lib/cart-context';
 import CheckoutModal from '@/components/modal/CheckoutModal';
@@ -9,8 +9,10 @@ import FloatingCartButton from '@/components/FloatingCartButton';
 import FloatingFAQButton from '@/components/FloatingFAQButton';
 import { UIProvider, useUIContext } from '@/lib/UIContext';
 import Header from '@/components/layout/Header';
+import initAutocomplete from '@/components/AutocompleteInput';
 
 function LayoutWithCart({ children }: { children: ReactNode }) {
+
   const { items: cartItems } = useCart();
   const { selectedProduct, isCheckoutOpen, closeCheckout } = useUIContext();
 

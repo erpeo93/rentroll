@@ -81,7 +81,7 @@ style={{ touchAction: 'none' }}
           {[...products, ...products].map((product, i) => (
             <div
               key={`${product.id}-${i}`}
-              className="flex-shrink-0 w-full sm:w-1/2 md:w-1/3 lg:w-1/4 cursor-pointer scale-90 hover:scale-95 transition-transform duration-300 
+              className="flex-shrink-0 w-full sm:w-1/2 md:w-1/3 lg:w-1/4 cursor-pointer scale-80 hover:scale-85 transition-transform duration-300 
                          group-hover:opacity-40 hover:opacity-100"
               onClick={() => router.push(`/product/${product.id}`)}
             >
@@ -105,8 +105,6 @@ style={{ touchAction: 'none' }}
           ))}
         </div>
       </section>
-
-      <div className="w-full h-3 bg-white" />
     </>
   );
 }

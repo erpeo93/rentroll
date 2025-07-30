@@ -2,12 +2,41 @@
 
 import { useCart } from '@/lib/cart-context';
 import { useRouter } from 'next/navigation';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { ChevronDown, ChevronUp } from 'lucide-react';
 import Footer from '@/components/layout/Footer';
+import AutocompleteInput from '@/components/AutocompleteInput';
+import { LoadScript } from '@react-google-maps/api';
 
-const VALID_CITIES = ['Milan', 'Rome', 'Florence', 'Turin'];
+const VALID_CITIES = ['Milano', 'Roma', 'Firenze', 'Torino', 'Sangano'];
+
+const CITY_MAP: Record<string, string> = {
+  Torino: 'Turin',
+  Roma: 'Rome',
+  Firenze: 'Florence',
+  Milano: 'Milan',
+  Napoli: 'Naples',
+};
+
+function getValidDeliveryDates() {
+  const result: string[] = [];
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  for (let i = 0; i <= 30; i++) {
+    const date = new Date(today);
+    date.setDate(today.getDate() + i);
+    if (date.getDay() === 0 && date > today) {
+      // Saturday (6), only future dates (strictly > today)
+      result.push(date.toISOString().slice(0, 10)); // yyyy-mm-dd
+    }
+  }
+  return result;
+}
+
+const deliverySlots = ["18-20", "20-22"];
+const validDates = getValidDeliveryDates();
 
 export default function CheckoutPage() {
   const { items, getTotalPrice, clearCart, updateQuantity } = useCart();
@@ -22,25 +51,53 @@ export default function CheckoutPage() {
   });
   const [touched, setTouched] = useState<Record<string, boolean>>({});
   const [termsAccepted, setTermsAccepted] = useState(false);
+const [deliveryDate, setDeliveryDate] = useState('');
+const [deliverySlot, setDeliverySlot] = useState('');
   const [codeSent, setCodeSent] = useState(false);
   const [code, setCode] = useState('');
 
+
+  useEffect(() => {
+    if (validDates.length > 0) {
+      setDeliveryDate(validDates[0]);
+      setDeliverySlot(deliverySlots[0]);
+    }
+  }, [validDates]);
+
   const isValidEmail = (email: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-  const isSupportedCity = VALID_CITIES.includes(form.city.trim());
+  const isSupportedCity = VALID_CITIES.includes(form.city);
   const isValidPhone = /^\d{10}$/.test(form.phone.trim());
+  const isValidAddress = form.address.trim().length > 0
+
+const validDeliveryDates = getValidDeliveryDates();
+
+const isValidDelivery = 
+  deliveryDate !== '' &&
+  deliverySlot !== '' &&
+  validDeliveryDates.includes(deliveryDate);
 
   const isFormValid =
     isValidEmail(form.email) &&
     isSupportedCity &&
-    form.address.trim().length > 0 &&
+    isValidAddress &&
+    isValidDelivery &&
     isValidPhone &&
     termsAccepted;
 
-  const handleChange = (field: keyof typeof form, value: string) => {
-    setForm({ ...form, [field]: value });
-    setTouched({ ...touched, [field]: true });
-  };
+const handleChange = (field: keyof typeof form, value: string) => {
+  setForm((prev) => {
+    const updatedForm = { ...prev, [field]: value };
 
+    // Reset address if city changes
+    if (field === 'city' && value !== prev.city) {
+      updatedForm.address = '';
+    }
+
+    return updatedForm;
+  });
+
+  setTouched((prev) => ({ ...prev, [field]: true }));
+};
   const sendCode = async () => {
     if (!isValidPhone) {
       alert('Enter a valid 10-digit phone number first.');
@@ -95,6 +152,10 @@ else {
   };
 
   return (
+    <LoadScript
+      googleMapsApiKey={process.env.NEXT_PUBLIC_GOOGLE_API_KEY!}
+      libraries={['places']}
+    >
     <main className="px-4">
       <div className="max-w-2xl mx-auto mt-10 p-4 bg-neutral-100 shadow rounded-lg space-y-6">
         <h1 className="text-2xl font-bold">Checkout</h1>
@@ -144,40 +205,86 @@ else {
             )}
           </div>
 
-          {/* City */}
-          <div>
-            <label className="block font-medium mb-1">City *</label>
-            <input
-              type="text"
-              value={form.city}
-              onChange={(e) => handleChange('city', e.target.value)}
-              className="w-full border border-gray-300 rounded px-3 py-2"
-            />
-            {form.city && !isSupportedCity && (
-              <div className="mt-1 text-sm text-red-600">
-                Sorry! Our service is not available in your city!
-                <div className="mt-1">
-                  <Link href="/help" className="text-blue-600 underline">
-                    Let us know
+{/* City */}
+<div>
+  <label className="block font-medium mb-1">City *</label>
+  <select
+    value={form.city}
+    onChange={(e) => handleChange('city', e.target.value)}
+    className="w-full px-4 py-2 border rounded"
+  >
+    <option value="">Select your city...</option>
+    {VALID_CITIES.map((city) => (
+      <option key={city} value={city}>
+        {city}
+      </option>
+    ))}
+  </select>
+              <div className="mt-1 text-sm">
+                Not available in your city?
+                 <Link href="/help" className="text-blue-600 underline">
+                   Let us know
                   </Link>
-                </div>
               </div>
-            )}
-          </div>
+</div>
 
-          {/* Address */}
-          <div>
-            <label className="block font-medium mb-1">Address *</label>
-            <input
-              type="text"
-              value={form.address}
-              onChange={(e) => handleChange('address', e.target.value)}
-              className="w-full border border-gray-300 rounded px-3 py-2"
-            />
-            {form.address.trim().length === 0 && touched.address && (
-              <p className="text-red-600 text-sm mt-1">Address is required.</p>
-            )}
-          </div>
+{/* Address */}
+<div>
+  <label className="block font-medium mb-1">Address *</label>
+  <AutocompleteInput
+ mode="address"
+    value={form.address}
+cityFilter={CITY_MAP[form.city] || form.city}
+    onChange={(val) => handleChange('address', val)}
+    placeholder="Start typing your address..."
+  />
+  {form.address.trim().length === 0 && touched.address && (
+    <p className="text-red-600 text-sm mt-1">Address is required.</p>
+  )}
+</div>
+
+{form.city && form.address && (
+  <div className="mt-4 space-y-4">
+    {/* Delivery Date Selector */}
+    <div>
+      <label className="block font-medium mb-1">Delivery Date *</label>
+      <select
+        className="w-full px-4 py-2 border rounded"
+        value={deliveryDate}
+        onChange={(e) => {
+          setDeliveryDate(e.target.value);
+          setDeliverySlot(deliverySlots[0]); // Reset slot when date changes
+        }}
+      >
+        {getValidDeliveryDates().map((date) => (
+          <option key={date} value={date}>
+            {new Date(date).toLocaleDateString(undefined, {
+              weekday: 'long',
+              year: 'numeric',
+              month: 'long',
+              day: 'numeric',
+            })}
+          </option>
+        ))}
+      </select>
+    </div>
+
+    {/* Delivery Time Slot Selector */}
+    {deliveryDate && (
+      <div>
+        <label className="block font-medium mb-1">Delivery Time Slot *</label>
+        <select
+          className="w-full px-4 py-2 border rounded"
+          value={deliverySlot}
+          onChange={(e) => setDeliverySlot(e.target.value)}
+        >
+          <option value="18-20">18:00 - 20:00</option>
+          <option value="20-22">20:00 - 22:00</option>
+        </select>
+      </div>
+    )}
+  </div>
+)}
 
           {/* Phone Number */}
           <div>
@@ -260,5 +367,6 @@ else {
 
       <Footer />
     </main>
+</LoadScript>
   );
 }
