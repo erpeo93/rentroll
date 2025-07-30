@@ -10,6 +10,7 @@ import FloatingFAQButton from '@/components/FloatingFAQButton';
 import { UIProvider, useUIContext } from '@/lib/UIContext';
 import Header from '@/components/layout/Header';
 import initAutocomplete from '@/components/AutocompleteInput';
+import Script from 'next/script';
 
 function LayoutWithCart({ children }: { children: ReactNode }) {
 
@@ -38,9 +39,16 @@ export default function RootLayout({ children }: { children: ReactNode }) {
     ? new URLSearchParams(window.location.search).get('lang')
     : null;
   const lang = langParam === 'it' ? 'it' : 'en';
+const googleMapsApiKey = process.env.NEXT_PUBLIC_GOOGLE_API_KEY;
 
   return (
     <html lang={lang}>
+<head>
+        <Script
+          src={`https://maps.googleapis.com/maps/api/js?key=${googleMapsApiKey}&libraries=places`}
+          strategy="beforeInteractive"
+        />
+</head>
       <body className="bg-gray-50 text-gray-900">
         <CartProvider>
 	<UIProvider>

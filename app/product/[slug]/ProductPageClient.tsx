@@ -27,7 +27,7 @@ export default function ProductPageClient({ slug }: Props) {
       })
       .then((data) => {
         setProduct(data);
-        setMainImage("/catan.jfif");
+        setMainImage(data.imageUrl);
       })
       .catch((err) => setError(err.message))
       .finally(() => setLoading(false));
@@ -41,7 +41,7 @@ export default function ProductPageClient({ slug }: Props) {
       name: product.name,
       description: product.description,
       image: product.imageUrl,
-      price: 10
+      price: product.price
     });
 
     setJustAdded(true);
@@ -56,7 +56,7 @@ export default function ProductPageClient({ slug }: Props) {
     return <div className="p-6 text-center text-red-600">Error: {error || 'Product not found'}</div>;
   }
 
-  const SECONDARY_IMAGES = ['/catan.jfif', '/catan.jfif', '/catan.jfif'];
+  const SECONDARY_IMAGES = product.secondaryImages || [];
   const bulletPoints = product.bulletPoints || [];
   const inCart = isInCart(product.id);
 
@@ -78,19 +78,19 @@ export default function ProductPageClient({ slug }: Props) {
       <p className="text-gray-700 mb-6">{product.description}</p>
 
       <div className="mb-4 rounded-xl overflow-hidden border border-gray-300 max-h-[400px]">
-        <img src="/catan.jfif" alt={product.name} className="w-full h-auto object-cover" />
+        <img src={mainImage ?? undefined} alt={product.name} className="w-full h-auto object-cover" />
       </div>
 
       <div className="flex gap-4 overflow-x-auto pb-4 mb-8">
-        {[product.imageUrl, ...SECONDARY_IMAGES].map((img, i) => (
+        {[product.imageUrl, ...SECONDARY_IMAGES].map((imm, i) => (
           <button
             key={i}
-            onClick={() => setMainImage(img)}
+            onClick={() => setMainImage(imm)}
             className={`flex-shrink-0 w-24 h-24 rounded-xl overflow-hidden border-2 ${
-              img === mainImage ? 'border-blue-600' : 'border-transparent'
+              imm === mainImage ? 'border-blue-600' : 'border-transparent'
             }`}
           >
-            <img src="/catan.jfif" alt={`thumb-${i}`} className="w-full h-full object-cover" />
+            <img src={imm ?? undefined} alt={`thumb-${i}`} className="w-full h-full object-cover" />
           </button>
         ))}
       </div>
@@ -171,7 +171,7 @@ export default function ProductPageClient({ slug }: Props) {
               Go to Cart
             </>
           ) : product.quantity === 0 ? (<> Unavailable </>) : (
-            <>Add to Cart</>
+            <>Add to Cart: {product.price}€</>
           )}
         </button>
       </div>

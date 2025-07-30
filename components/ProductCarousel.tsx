@@ -88,7 +88,7 @@ style={{ touchAction: 'none' }}
               <div className="border border-gray-300 rounded-2xl shadow-md hover:shadow-xl transition-shadow duration-300 bg-white">
                 <div className="aspect-square rounded-xl overflow-hidden relative">
                   <img
-                    src={'catan.jfif'} // Replace with product.image when dynamic
+                    src={product.imageUrl}
                     alt={product.name}
                     className="w-full h-full object-cover"
                     loading="lazy"

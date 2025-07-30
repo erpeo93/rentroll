@@ -59,7 +59,7 @@ const searchParams = useSearchParams();
                   <li key={item.id} className="py-4 flex gap-4 items-center">
                     {/* Image */}
                     <img
-                      src="catan.jfif"
+                      src={item.image}
                       alt={item.name}
                       className="w-20 h-20 object-cover rounded-xl border"
                     />
@@ -105,7 +105,7 @@ const searchParams = useSearchParams();
                         </button>
                       </div>
                       <span className="text-sm text-gray-700 mt-1">
-                        Total: €{(item.quantity * 5).toFixed(2)}
+                        Total: €{(item.quantity * item.price).toFixed(2)}
                       </span>
                     </div>
                   </li>

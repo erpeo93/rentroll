@@ -7,7 +7,6 @@ import Link from 'next/link';
 import { ChevronDown, ChevronUp } from 'lucide-react';
 import Footer from '@/components/layout/Footer';
 import AutocompleteInput from '@/components/AutocompleteInput';
-import { LoadScript } from '@react-google-maps/api';
 
 const VALID_CITIES = ['Milano', 'Roma', 'Firenze', 'Torino', 'Sangano'];
 
@@ -152,10 +151,6 @@ else {
   };
 
   return (
-    <LoadScript
-      googleMapsApiKey={process.env.NEXT_PUBLIC_GOOGLE_API_KEY!}
-      libraries={['places']}
-    >
     <main className="px-4">
       <div className="max-w-2xl mx-auto mt-10 p-4 bg-neutral-100 shadow rounded-lg space-y-6">
         <h1 className="text-2xl font-bold">Checkout</h1>
@@ -174,7 +169,7 @@ else {
               {items.map((item) => (
                 <li key={item.id} className="py-4 flex gap-4 items-center">
                   <img
-                    src="catan.jfif"
+                    src={item.image}
                     alt={item.name}
                     className="w-16 h-16 object-cover rounded border"
                   />
@@ -367,6 +362,5 @@ cityFilter={CITY_MAP[form.city] || form.city}
 
       <Footer />
     </main>
-</LoadScript>
   );
 }

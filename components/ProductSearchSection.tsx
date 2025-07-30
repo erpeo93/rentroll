@@ -38,7 +38,7 @@ export default function ProductSearchSection({
       return;
     }
 
-    addItem({ id: product.id, name: product.name, image : product.image, description : product.description, price : 10 });
+    addItem({ id: product.id, name: product.name, image : product.imageUrl, description : product.description, price : product.price });
     animatingProducts.current.add(product.id);
     setButtonStates((prev) => ({
       ...prev,
@@ -262,7 +262,7 @@ const [showUnavailable, setShowUnavailable] = useState(false);
             >
               <div className="flex flex-col md:flex-row flex-1 gap-4 min-w-0">
                 <img
-                  src="catan.jfif"
+                  src={product.imageUrl}
                   alt={product.name}
                   className="w-40 h-40 object-cover rounded-md flex-shrink-0"
                   loading="lazy"
@@ -288,7 +288,7 @@ const [showUnavailable, setShowUnavailable] = useState(false);
                     }
                   `}
                 >
-                  {buttonStates[product.id] === 'default' && product.quantity > 0 && 'Add to Cart'}
+                  {buttonStates[product.id] === 'default' && product.quantity > 0 && 'Add to Cart' + ': ' + product.price + '€'}
                   {buttonStates[product.id] === 'added' && (
                     <>
                       <FaCheck className="mr-2" /> Added!
