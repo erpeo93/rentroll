@@ -48,6 +48,7 @@ model Product {
   orders    Order[]
   intentProducts IntentProduct[]  @relation("ProductToIntentProduct")
   bulletPoints String[] 
+  quantity    Int      @default(0)
 }
 
 model ProductInstance {

@@ -8,9 +8,11 @@ export async function GET(req: Request) {
   const name = searchParams.get("name") || "";
   const category = searchParams.get("category") || "";
   const type = searchParams.get("type") || "";
+  const showUnavailable = searchParams.get("showUnavailable") == "true";
 
   const products = await prisma.product.findMany({
     where: {
+...(showUnavailable ? {} : { quantity: { gt: 0 } }),
       name: {
         contains: name,
         mode: "insensitive"

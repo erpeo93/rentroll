@@ -130,6 +130,7 @@ export default function ProductPageClient({ slug }: Props) {
 
       <div className="max-w-xs w-full">
         <button
+          disabled={justAdded || product.quantity === 0}
           onClick={inCart && !justAdded ? () => router.push('/cart') : handleAddToCart}
           className={`px-6 py-3 rounded-md text-white w-full transition-all duration-300 flex items-center justify-center gap-2 ${
             justAdded
@@ -169,7 +170,7 @@ export default function ProductPageClient({ slug }: Props) {
               </svg>
               Go to Cart
             </>
-          ) : (
+          ) : product.quantity === 0 ? (<> Unavailable </>) : (
             <>Add to Cart</>
           )}
         </button>

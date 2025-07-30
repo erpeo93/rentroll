@@ -60,6 +60,7 @@ export default function ProductSearchSection({
   const searchRef = useRef<HTMLDivElement>(null);
   const searchButtonRef = useRef<HTMLButtonElement>(null);
   const hasManuallySelected = useRef(false);
+const [showUnavailable, setShowUnavailable] = useState(false);
 
   // Update categories on activeType change
   useEffect(() => {
@@ -82,6 +83,7 @@ export default function ProductSearchSection({
     if (search) q.set('name', search);
     if (category) q.set('category', category);
     if (activeType) q.set('type', activeType);
+    if(showUnavailable) q.set('showUnavailable', 'true');
 
     const url = `/api/products?${q.toString()}`;
     fetch(url)
@@ -95,7 +97,7 @@ export default function ProductSearchSection({
           setSuggestions([]);
         }
       });
-  }, [search, category, activeType]);
+  }, [search, category, activeType, showUnavailable]);
 
   // Click outside handlers to close dropdowns
   useEffect(() => {
@@ -228,6 +230,16 @@ export default function ProductSearchSection({
                     </option>
                   ))}
                 </select>
+
+<div className="flex items-center gap-2 mt-4">
+  <input
+    type="checkbox"
+    id="toggle-unavailable"
+    checked={showUnavailable}
+    onChange={() => setShowUnavailable(!showUnavailable)}
+  />
+  <label htmlFor="toggle-unavailable">Show unavailable products</label>
+</div>
               </div>
             )}
           </div>
@@ -265,7 +277,7 @@ export default function ProductSearchSection({
               <div className="flex gap-2 mt-4 md:mt-0 md:flex-col md:justify-end md:items-end min-w-[140px]">
                 <button
                   onClick={() => handleAddToCart(product)}
-                  disabled={buttonStates[product.id] === 'added'}
+                  disabled={buttonStates[product.id] === 'added' || product.quantity === 0}
                   className={`max-h-10 flex-1 min-w-[40%] text-sm py-2 px-4 rounded-md font-semibold transition flex items-center justify-center min-w-[120px]
                     ${
                       buttonStates[product.id] === 'default'
@@ -276,13 +288,14 @@ export default function ProductSearchSection({
                     }
                   `}
                 >
-                  {buttonStates[product.id] === 'default' && 'Add to Cart'}
+                  {buttonStates[product.id] === 'default' && product.quantity > 0 && 'Add to Cart'}
                   {buttonStates[product.id] === 'added' && (
                     <>
                       <FaCheck className="mr-2" /> Added!
                     </>
                   )}
-                  {buttonStates[product.id] === 'goToCart' && 'Go to Cart'}
+                  {(buttonStates[product.id] === 'goToCart') && ('Go to Cart')}
+		  {product.quantity === 0 && 'Unavailable'}
                 </button>
 
                 <button

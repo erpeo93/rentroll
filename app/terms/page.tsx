@@ -1,3 +1,5 @@
+import Footer from '@/components/layout/Footer';
+
 export default function TermsPage() {
   return (
     <main className="max-w-4xl mx-auto p-6">
@@ -7,6 +9,7 @@ export default function TermsPage() {
         <p className="mb-2">By using RentRoll, you agree to...</p>
         <p>[...to be completed by legal later...]</p>
       </div>
+    <Footer />
     </main>
   );
 }

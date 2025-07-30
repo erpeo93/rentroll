@@ -11,13 +11,15 @@ export type CartItem = {
   description?: string;
   quantity: number;
   price : number;
+  adjusted?: boolean;
+  unavailable?: boolean;
 };
 
 type CartContextType = {
   items: CartItem[];
   addItem: (item: Omit<CartItem, 'quantity'>) => void;
   removeItem: (id: string) => void;
-  updateQuantity: (id: string, quantity: number) => void;
+  updateQuantity: (id: string, quantity: number, flags?: Partial<Pick<CartItem, 'adjusted' | 'unavailable'>>) => void;
   clearCart: () => void;
   isInCart: (id: string) => boolean;
  getTotalPrice: () => number;
@@ -48,32 +50,54 @@ export function CartProvider({ children }: { children: ReactNode }) {
     Cookies.set(COOKIE_KEY, JSON.stringify(items), { expires: 7 }); // 7 days expiry
   }, [items]);
 
-  const addItem = (item: Omit<CartItem, 'quantity'>) => {
-    setItems((prev) => {
-      const existing = prev.find((i) => i.id === item.id);
-      if (existing) {
-        return prev.map((i) =>
-          i.id === item.id ? { ...i, quantity: i.quantity + 1 } : i
-        );
-      }
-      return [...prev, { ...item, quantity: 1 }];
-    });
-  };
+const addItem = (newItem: Omit<CartItem, 'quantity'> & { quantity?: number }) => {
+  const quantity = newItem.quantity ?? 1;  // default to 1
+
+  setItems((prev) => {
+    const existingItem = prev.find((item) => item.id === newItem.id);
+
+    if (existingItem) {
+      return prev.map((item) =>
+        item.id === newItem.id
+          ? {
+              ...item,
+              quantity: item.quantity + quantity,
+              adjusted: newItem.adjusted ?? item.adjusted,
+              unavailable: newItem.unavailable ?? item.unavailable,
+            }
+          : item
+      );
+    }
+
+    // Add quantity to new item explicitly
+    return [...prev, { ...newItem, quantity }];
+  });
+};
+
 
   const removeItem = (id: string) => {
     setItems((prev) => prev.filter((item) => item.id !== id));
   };
 
-  const updateQuantity = (id: string, quantity: number) => {
-    setItems((prev) => {
-      if (quantity <= 0) {
-        return prev.filter((item) => item.id !== id);
-      }
-      return prev.map((item) =>
-        item.id === id ? { ...item, quantity } : item
-      );
-    });
-  };
+const updateQuantity = (
+  id: string,
+  quantity: number,
+  flags?: Partial<Pick<CartItem, 'adjusted' | 'unavailable'>>
+) => {
+  setItems((prev) =>
+    prev
+      .map((item) =>
+        item.id === id
+          ? {
+              ...item,
+              quantity,
+              ...(flags ?? {}),
+            }
+          : item
+      )
+      .filter((item) => item.quantity > 0)
+  );
+};
 
 const getTotalPrice = () => {
   return items.reduce((total, item) => total + item.price * item.quantity, 0);

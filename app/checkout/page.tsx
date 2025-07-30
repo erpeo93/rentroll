@@ -10,7 +10,7 @@ import Footer from '@/components/layout/Footer';
 const VALID_CITIES = ['Milan', 'Rome', 'Florence', 'Turin'];
 
 export default function CheckoutPage() {
-  const { items, getTotalPrice } = useCart();
+  const { items, getTotalPrice, clearCart, updateQuantity } = useCart();
   const router = useRouter();
 
   const [showRecap, setShowRecap] = useState(true);
@@ -71,9 +71,25 @@ export default function CheckoutPage() {
     });
 
     if (res.ok) {
-      alert('Order confirmed and verified!');
-      router.push('/');
-    } else {
+      clearCart();
+      router.push('/checkout/thank-you');
+    } else if (res.status === 409) {
+
+
+    const data = await res.json();
+
+    if (data?.items?.length) {
+      for (const item of data.items) {
+        updateQuantity(item.id, item.quantity, {
+          adjusted: item.adjusted,
+          unavailable: item.unavailable,
+        });
+      }
+    }
+
+router.push('/cart?update=true');
+}
+else {
       alert('Invalid code or error occurred.');
     }
   };
