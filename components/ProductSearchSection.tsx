@@ -288,7 +288,7 @@ const [showUnavailable, setShowUnavailable] = useState(false);
                     }
                   `}
                 >
-                  {buttonStates[product.id] === 'default' && product.quantity > 0 && 'Add to Cart' + ': ' + product.price + '€'}
+                  {buttonStates[product.id] === 'default' && product.quantity > 0 && t('add_to_cart') + ': ' + product.price + '€'}
                   {buttonStates[product.id] === 'added' && (
                     <>
                       <FaCheck className="mr-2" /> Added!

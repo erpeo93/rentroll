@@ -38,7 +38,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
   const langParam = typeof window !== 'undefined'
     ? new URLSearchParams(window.location.search).get('lang')
     : null;
-  const lang = langParam === 'it' ? 'it' : 'en';
+  const lang = langParam === 'en' ? 'en' : 'it';
 const googleMapsApiKey = process.env.NEXT_PUBLIC_GOOGLE_API_KEY;
 
   return (

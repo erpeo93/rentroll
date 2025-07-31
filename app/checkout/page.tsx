@@ -41,7 +41,7 @@ export default function CheckoutPage() {
   const { items, getTotalPrice, clearCart, updateQuantity } = useCart();
   const router = useRouter();
 
-  const [showRecap, setShowRecap] = useState(true);
+  const [showRecap, setShowRecap] = useState(false);
   const [form, setForm] = useState({
     email: '',
     city: '',
