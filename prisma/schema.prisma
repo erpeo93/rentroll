@@ -68,7 +68,10 @@ model Intent {
   user       User?    @relation(fields: [userId], references: [id])
   city       String?
   address    String?
-  deliveryWindow DateTime?
+  phone      String?
+  email      String?
+  deliveryWindowStart DateTime?
+  deliveryWindowEnd   DateTime?
   latitude   Float?
   longitude  Float?
   variant    String?
@@ -84,6 +87,8 @@ model IntentProduct {
   productId  String
   intent     Intent   @relation(fields: [intentId], references: [id])
   product    Product  @relation("ProductToIntentProduct", fields: [productId], references: [id])
+  quantity    Int      @default(0)
+  price     Float  @default(10)
 }
 
 model ProductRequest {

@@ -119,21 +119,33 @@ const handleChange = (field: keyof typeof form, value: string) => {
     sendCode();
   };
 
-  const handleSubmit = async () => {
-    const res = await fetch('/api/checkout/verify-and-submit', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ ...form, code, items }),
-    });
+const handleSubmit = async () => {
+  const [startHour, endHour] = deliverySlot.split('-').map(Number);
+  const baseDate = new Date(deliveryDate);
+  
+  const deliveryWindowStart = new Date(baseDate);
+  deliveryWindowStart.setHours(startHour, 0, 0, 0);
 
-    if (res.ok) {
-      clearCart();
-      router.push('/checkout/thank-you');
-    } else if (res.status === 409) {
+  const deliveryWindowEnd = new Date(baseDate);
+  deliveryWindowEnd.setHours(endHour, 0, 0, 0);
 
+  const res = await fetch('/api/checkout/verify-and-submit', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      ...form,
+      code,
+      items,
+      deliveryWindowStart: deliveryWindowStart.toISOString(),
+      deliveryWindowEnd: deliveryWindowEnd.toISOString(),
+    }),
+  });
 
+  if (res.ok) {
+    clearCart();
+    router.push('/checkout/thank-you');
+  } else if (res.status === 409) {
     const data = await res.json();
-
     if (data?.items?.length) {
       for (const item of data.items) {
         updateQuantity(item.id, item.quantity, {
@@ -142,13 +154,11 @@ const handleChange = (field: keyof typeof form, value: string) => {
         });
       }
     }
-
-router.push('/cart?update=true');
-}
-else {
-      alert('Invalid code or error occurred.');
-    }
-  };
+    router.push('/cart?update=true');
+  } else {
+    alert('Invalid code or error occurred.');
+  }
+};
 
   return (
     <main className="px-4">
