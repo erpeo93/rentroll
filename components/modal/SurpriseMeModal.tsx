@@ -59,7 +59,7 @@ useEffect(() => {
 }, []);
 
   const questionSets: Record<string, Question[]> = {
-    'board-game': [
+    'board_game': [
       {
         key: 'players',
         label: t('surprise_step_players'),
@@ -77,7 +77,7 @@ useEffect(() => {
         ],
       },
     ],
-    'video-game': [
+    'video_games': [
       {
         key: 'platform',
         label: t('surprise_step_platform'),
@@ -98,7 +98,7 @@ useEffect(() => {
         ],
       },
     ],
-    book: [
+    books: [
       {
         key: 'genre',
         label: t('surprise_step_genre'),
