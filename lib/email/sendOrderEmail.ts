@@ -28,12 +28,27 @@ export async function sendOrderEmail({
 }) {
   const total = items.reduce((sum, item) => sum + item.quantity * item.price, 0);
 
-  const deliveryTime = `${deliveryStart.toLocaleString()} - ${deliveryEnd.toLocaleString()}`;
+const start = new Date(deliveryStart);
+const end = new Date(deliveryEnd);
+
+const options: Intl.DateTimeFormatOptions = {
+  month: 'long',
+  day: 'numeric',
+  hour: 'numeric',
+  minute: '2-digit',
+};
+
+const startFormatted = start.toLocaleString('en-US', options);
+const endFormatted = end.toLocaleString('en-US', {
+  hour: 'numeric',
+  minute: '2-digit',
+});
+
+const deliveryTime = `${startFormatted} – ${endFormatted}`;
 
   const html = `
-    <h2>New Order Received</h2>
+    <h2>Here's your Order Recap</h2>
     <p><strong>Phone:</strong> ${phone}</p>
-    <p><strong>Email:</strong> ${to}</p>
     <p><strong>Address:</strong> ${address}, ${city}</p>
     <p><strong>Delivery Window:</strong> ${deliveryTime}</p>
 

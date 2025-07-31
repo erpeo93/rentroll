@@ -2,7 +2,7 @@
 
 import { useCart } from '@/lib/cart-context';
 import { useRouter } from 'next/navigation';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo  } from 'react';
 import Link from 'next/link';
 import { ChevronDown, ChevronUp } from 'lucide-react';
 import Footer from '@/components/layout/Footer';
@@ -35,9 +35,9 @@ function getValidDeliveryDates() {
 }
 
 const deliverySlots = ["18-20", "20-22"];
-const validDates = getValidDeliveryDates();
 
 export default function CheckoutPage() {
+const validDates = useMemo(() => getValidDeliveryDates(), []);
   const { items, getTotalPrice, clearCart, updateQuantity } = useCart();
   const router = useRouter();
 
