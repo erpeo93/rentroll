@@ -11,8 +11,6 @@ export async function POST(req: Request) {
     phone = '+39' + phone.replace(/^0+/, ''); // remove leading 0s just in case
   }
 
-const isTestEnv = process.env.NEXT_PUBLIC_TEST === 'true';
-
   let code = Math.floor(100000 + Math.random() * 900000).toString(); 
   setVerificationCode(phone, code);
 

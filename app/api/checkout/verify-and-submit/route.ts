@@ -17,13 +17,18 @@ export async function POST(req: Request) {
     deliveryWindowStart,
     deliveryWindowEnd
   } = await req.json();
+  
+  let adj_phone = phone
+  if (!phone.startsWith('+39')) {
+    adj_phone = '+39' + phone.replace(/^0+/, ''); // remove leading 0s just in case
+  }
 
   const isProdEnv = process.env.PRODUCTION === 'true';
-  const correctCode = getVerificationCode(phone);
+  const correctCode = getVerificationCode(adj_phone);
   if (isProdEnv && code !== correctCode) {
     return NextResponse.json({ error: 'Invalid code' }, { status: 401 });
   }
-  deleteVerificationCode(phone);
+  deleteVerificationCode(adj_phone);
 
   const updatedItems = [];
   let hasChanges = false;
@@ -70,7 +75,7 @@ const intent = await tx.intent.create({
   data: {
     city,
     address,
-    phone,
+    phone : adj_phone,
     email,
     status: 'verified',
     deliveryWindowStart: new Date(deliveryWindowStart),
@@ -101,7 +106,7 @@ await sendOrderEmail({
   })),
   city,
   address,
-  phone,
+  phone: adj_phone,
   deliveryStart: deliveryWindowStart,
   deliveryEnd: deliveryWindowEnd,
 });
