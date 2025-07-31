@@ -2,6 +2,7 @@ import { PrismaClient } from "@prisma/client";
 import { NextResponse } from 'next/server';
 import sendAdminEmail from '@/lib/email/sendAdminEmail';
 import { getVerificationCode, deleteVerificationCode } from '@/lib/cache/codeCache';
+import { sendOrderEmail } from '@/lib/email/sendOrderEmail';
 
 const prisma = new PrismaClient();
 
@@ -65,28 +66,49 @@ export async function POST(req: Request) {
       });
     }
 
-    const intent = await tx.intent.create({
-      data: {
-        city,
-        address,
-        phone,
-        email,
-        status: 'verified',
-        deliveryWindowStart: new Date(deliveryWindowStart),
-        deliveryWindowEnd: new Date(deliveryWindowEnd),
-        products: {
-          create: items.map((item: any) => ({
-            productId: item.id,
-            quantity: item.quantity,
-            price: item.price,
-          })),
-        },
+const intent = await tx.intent.create({
+  data: {
+    city,
+    address,
+    phone,
+    email,
+    status: 'verified',
+    deliveryWindowStart: new Date(deliveryWindowStart),
+    deliveryWindowEnd: new Date(deliveryWindowEnd),
+    products: {
+      create: items.map((item: any) => ({
+        productId: item.id,
+        quantity: item.quantity,
+        price: item.price,
+      })),
+    },
+  },
+  include: {
+    products: {
+      include: {
+        product: true,
       },
-    });
+    },
+  },
+});
+
+await sendOrderEmail({
+  to: email,
+  items: intent.products.map((p) => ({
+    name: p.product.name,
+    quantity: p.quantity,
+    price: p.product.price,
+  })),
+  city,
+  address,
+  phone,
+  deliveryStart: deliveryWindowStart,
+  deliveryEnd: deliveryWindowEnd,
+});
 
     return intent;
   });
 
-  await sendAdminEmail('New Order', JSON.stringify(fulfilled, null, 2));
+  //await sendAdminEmail('New Order', JSON.stringify(fulfilled, null, 2));
   return NextResponse.json({ success: true });
 }

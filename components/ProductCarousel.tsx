@@ -33,9 +33,9 @@ const { showFAQModal } = useUIContext();
       const timeDiff = timestamp - lastScrollTimeRef.current;
 
       if (timeDiff > 20) {
-	var baseSpeedFactor = 1200.0; // tweak this number for speed scaling
+	var baseSpeedFactor = 1000.0; // tweak this number for speed scaling
 if (showFAQModal  ) baseSpeedFactor = 0;
-	const scrollAmount = baseSpeedFactor / el.offsetWidth * scrollSpeedRef.current;
+	const scrollAmount = baseSpeedFactor / (el.offsetWidth / 2.0) * scrollSpeedRef.current;
         el.scrollLeft += scrollAmount;
 
         // Looping logic: once halfway, reset
