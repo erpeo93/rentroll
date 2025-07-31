@@ -49,10 +49,14 @@ export async function sendOrderEmail({
 
     <h3>Total: €${total.toFixed(2)}</h3>
   `;
+  
+  let from_final = '"RentRoll Orders" <orders@demomailtrap.co>'
+  let to_final = "leonardo.lucania@outlook.it"
+  to_final = to
 
   await transporter.sendMail({
-    from: '"RentRoll Orders" <orders@rentroll.com>',
-    to,
+    from: from_final,
+    to : to_final,
     subject: 'Your RentRoll Order Confirmation',
     html,
   });

@@ -11,22 +11,33 @@ export default function FAQModal({ onClose }: { onClose: () => void }) {
   const lang = typeof window !== 'undefined' && navigator.language.startsWith('it') ? 'it' : 'en';
   const faq = lang === 'it' ? faqIt : faqEn;
 
-  useEffect(() => {
-    const originalOverflow = document.body.style.overflow;
-    const originalHtmlOverflow = document.documentElement.style.overflow;
+useEffect(() => {
+  const scrollY = window.scrollY;
+  const originalOverflow = document.body.style.overflow;
+  const originalHtmlOverflow = document.documentElement.style.overflow;
+  const originalPosition = document.body.style.position;
+  const originalTop = document.body.style.top;
+  const originalWidth = document.body.style.width;
 
-    document.body.style.overflow = 'hidden';
-    document.documentElement.style.overflow = 'hidden';
-    document.body.style.position = 'fixed';
-    document.body.style.width = '100%';
+  document.body.style.overflow = 'hidden';
+  document.documentElement.style.overflow = 'hidden';
 
-    return () => {
-      document.body.style.overflow = originalOverflow;
-      document.documentElement.style.overflow = originalHtmlOverflow;
-      document.body.style.position = '';
-      document.body.style.width = '';
-    };
-  }, []);
+  // Fix the body's position so page doesn't jump
+  document.body.style.position = 'fixed';
+  document.body.style.top = `-${scrollY}px`;
+  document.body.style.width = '100%';
+
+  return () => {
+    document.body.style.overflow = originalOverflow;
+    document.documentElement.style.overflow = originalHtmlOverflow;
+    document.body.style.position = originalPosition;
+    document.body.style.top = originalTop;
+    document.body.style.width = originalWidth;
+
+    // Restore scroll position on close
+    window.scrollTo(0, scrollY);
+  };
+}, []);
 
   return (
     <ModalWrapper onClose={onClose}>
