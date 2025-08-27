@@ -65,7 +65,7 @@ const deliveryTime = `${startFormatted} – ${endFormatted}`;
     <h3>Total: €${total.toFixed(2)}</h3>
   `;
   
-  let from_final = '"RentRoll Orders" <orders@demomailtrap.co>'
+  let from_final = '"RentRoll Orders" <orders@arcadegames.food>'
   let to_final = "leonardo.lucania@outlook.it"
   to_final = to
 
