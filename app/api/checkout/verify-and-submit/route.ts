@@ -97,6 +97,7 @@ const intent = await tx.intent.create({
   },
 });
 
+/*
 await sendOrderEmail({
   to: email,
   items: intent.products.map((p) => ({
@@ -110,6 +111,7 @@ await sendOrderEmail({
   deliveryStart: deliveryWindowStart,
   deliveryEnd: deliveryWindowEnd,
 });
+*/
 
     return intent;
   });
