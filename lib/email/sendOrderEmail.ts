@@ -73,10 +73,10 @@ export async function sendOrderEmail({
     body: JSON.stringify({
       from: {
         email: process.env.SMTP_SENDER,
-        name: "RentRoll Orders",
+        name: "Arcade",
       },
       to: [{ email: to }],
-      subject: "Your RentRoll Order Confirmation",
+      subject: "Il tuo ordine Arcade",
       html,
     }),
   });
