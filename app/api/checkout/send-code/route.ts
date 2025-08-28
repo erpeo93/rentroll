@@ -16,7 +16,7 @@ export async function POST(req: Request) {
 
   try {
     await client.messages.create({
-      body: `Your RentRoll verification code is: ${code}`,
+      body: `Il tuo codice di conferma ordine Arcade é: ${code}`,
       from: process.env.TWILIO_PHONE!,
       to: phone,
     });

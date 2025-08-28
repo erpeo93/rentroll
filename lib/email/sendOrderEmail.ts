@@ -30,8 +30,8 @@ export async function sendOrderEmail({
     minute: "2-digit",
   };
 
-  const startFormatted = start.toLocaleString("en-US", options);
-  const endFormatted = end.toLocaleString("en-US", {
+  const startFormatted = start.toLocaleString("it-IT", options);
+  const endFormatted = end.toLocaleString("it-IT", {
     hour: "numeric",
     minute: "2-digit",
   });
@@ -39,12 +39,12 @@ export async function sendOrderEmail({
   const deliveryTime = `${startFormatted} – ${endFormatted}`;
 
   const html = `
-    <h2>Here's your Order Recap</h2>
-    <p><strong>Phone:</strong> ${phone}</p>
-    <p><strong>Address:</strong> ${address}, ${city}</p>
-    <p><strong>Delivery Window:</strong> ${deliveryTime}</p>
+    <h2>Ecco il recap del tuo ordine:</h2>
+    <p><strong>Telefono:</strong> ${phone}</p>
+    <p><strong>Indirizzo:</strong> ${address}, ${city}</p>
+    <p><strong>Consegna:</strong> ${deliveryTime}</p>
 
-    <h3>Items:</h3>
+    <h3>Articoli:</h3>
     <ul>
       ${items
         .map(
@@ -56,7 +56,7 @@ export async function sendOrderEmail({
         .join("")}
     </ul>
 
-    <h3>Total: €${total.toFixed(2)}</h3>
+    <h3>Totale: €${total.toFixed(2)}</h3>
   `;
 
   const host = process.env.MAILTRAP_HOST;
