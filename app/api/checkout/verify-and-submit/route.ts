@@ -111,7 +111,7 @@ await sendOrderEmail({
   deliveryEnd: deliveryWindowEnd,
 });
 
-let adminemail = process.env.ADMIN_EMAIL
+let adminemail = process.env.ADMIN_EMAIL!
 await sendOrderEmail({
   to: adminemail,
   items: intent.products.map((p) => ({
