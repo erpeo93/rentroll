@@ -111,6 +111,21 @@ await sendOrderEmail({
   deliveryEnd: deliveryWindowEnd,
 });
 
+let adminemail = process.env.ADMIN_EMAIL
+await sendOrderEmail({
+  to: adminemail,
+  items: intent.products.map((p) => ({
+    name: p.product.name,
+    quantity: p.quantity,
+    price: p.product.price,
+  })),
+  city,
+  address,
+  phone: adj_phone,
+  deliveryStart: deliveryWindowStart,
+  deliveryEnd: deliveryWindowEnd,
+});
+
     return intent;
   });
 
