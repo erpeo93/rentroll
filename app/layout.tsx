@@ -50,14 +50,14 @@ const googleMapsApiKey = process.env.NEXT_PUBLIC_GOOGLE_API_KEY;
         />
 </head>
       <body className="bg-gray-50 text-gray-900">
+          <I18nProvider lang={lang}>
         <CartProvider>
 	<UIProvider>
         <Header />
-          <I18nProvider lang={lang}>
             <LayoutWithCart>{children}</LayoutWithCart>
-          </I18nProvider>
 	</UIProvider>
         </CartProvider>
+          </I18nProvider>
       </body>
     </html>
   );

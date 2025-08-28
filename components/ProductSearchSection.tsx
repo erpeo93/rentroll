@@ -214,10 +214,11 @@ const [showUnavailable, setShowUnavailable] = useState(false);
                   }}
                   className="bg-gray-100 border border-gray-300 rounded p-2 w-full"
                 >
-                  <option value="ENTERTAINMENT">Entertainment</option>
-                  <option value="CONSUMABLE">Consumables</option>
+                  <option value="ENTERTAINMENT">Giochi Da Tavolo</option>
+                  <option value="CONSUMABLE">Cibo</option>
                 </select>
 
+{/*
                 <select
                   value={category}
                   onChange={(e) => setCategory(e.target.value)}
@@ -230,6 +231,7 @@ const [showUnavailable, setShowUnavailable] = useState(false);
                     </option>
                   ))}
                 </select>
+*/}
 
 <div className="flex items-center gap-2 mt-4">
   <input
@@ -238,13 +240,13 @@ const [showUnavailable, setShowUnavailable] = useState(false);
     checked={showUnavailable}
     onChange={() => setShowUnavailable(!showUnavailable)}
   />
-  <label htmlFor="toggle-unavailable">Show unavailable products</label>
+  <label htmlFor="toggle-unavailable">Mostra Prodotti Non Disponibili</label>
 </div>
               </div>
             )}
           </div>
 
-          {activeType === 'ENTERTAINMENT' && (
+          {activeType === 'ENTERTAINMENT' && false && (
             <button
               onClick={() => setShowSurpriseModal(true)}
               className="bg-indigo-600 hover:bg-indigo-700 text-white py-2 px-4 rounded-md font-semibold transition"
@@ -291,18 +293,18 @@ const [showUnavailable, setShowUnavailable] = useState(false);
                   {buttonStates[product.id] === 'default' && product.quantity > 0 && t('add_to_cart') + ': ' + product.price + '€'}
                   {buttonStates[product.id] === 'added' && (
                     <>
-                      <FaCheck className="mr-2" /> Added!
+                      <FaCheck className="mr-2" /> Aggiunto!
                     </>
                   )}
-                  {(buttonStates[product.id] === 'goToCart') && ('Go to Cart')}
-		  {product.quantity === 0 && 'Unavailable'}
+                  {(buttonStates[product.id] === 'goToCart') && ('Al Carrello')}
+		  {product.quantity === 0 && 'Terminato'}
                 </button>
 
                 <button
                   onClick={() => router.push(`/product/${product.id}`)}
                   className="max-h-10 flex-1 min-w-[40%] text-sm btn-discovery py-2 px-4 min-w-[120px] rounded-md font-semibold border border-black text-indigo-600 hover:bg-indigo-600 hover:text-white transition flex justify-center"
                 >
-                  Discover
+                  Scopri
                 </button>
               </div>
             </div>

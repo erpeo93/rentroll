@@ -1,5 +1,18 @@
 [
-  { "q": "Cosa pago?", "a": "Solo la consegna. Restituisci con l’ordine successivo." },
-  { "q": "Quanto posso tenere un prodotto?", "a": "Finché il saldo è attivo." },
-  { "q": "E se perdo un prodotto?", "a": "Useremo il tuo saldo preautorizzato." }
+    {
+        "q": "Posso restituire i giochi da tavolo che ho acquistato?",
+        "a": "Certo. Assicurati che siano in buone condizioni. Non c'e' alcun limite di tempo per la restituzione."
+    },
+    {
+        "q": "Se restituisco un gioco da tavolo precedentemente acquistato, mi verrà accreditato l' intero importo da me pagato?",
+        "a": "Si, a patto che le condizioni del gioco siano le stesse in cui é stato consegnato."
+    },
+    {
+        "q": "Posso scambiare giochi da tavolo che non uso piu?",
+        "a": "Assolutamente si! Comunicalo al nostro addetto al momento della consegna."
+    },
+    {
+        "q": "Posso annullare un ordine?",
+        "a": "Si, scrivi a orders@arcadegames.food."
+    }
 ]

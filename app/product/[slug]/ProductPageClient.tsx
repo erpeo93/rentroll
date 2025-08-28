@@ -69,7 +69,7 @@ export default function ProductPageClient({ slug }: Props) {
         <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7"></path>
         </svg>
-        Go back to catalogue
+        Torna al Catalogo
       </button>
     <div className="max-w-4xl mx-auto p-6 rounded-lg bg-neutral-100 shadow-sm hover:shadow-md">
       {/* Added border & rounded corners to this main container */}
@@ -96,7 +96,7 @@ export default function ProductPageClient({ slug }: Props) {
       </div>
 
       <section className="mb-6">
-        <h2 className="text-xl font-semibold mb-2">Details</h2>
+        <h2 className="text-xl font-semibold mb-2">Dettagli</h2>
         {bulletPoints.length > 0 ? (
           <ul className="list-disc list-inside text-gray-700 space-y-1">
             {bulletPoints.map((point: string, i: number) => (
@@ -104,7 +104,7 @@ export default function ProductPageClient({ slug }: Props) {
             ))}
           </ul>
         ) : (
-          <p className="text-gray-700">No additional details.</p>
+          <p className="text-gray-700">Nessuna informazione aggiuntiva.</p>
         )}
       </section>
 
@@ -113,7 +113,7 @@ export default function ProductPageClient({ slug }: Props) {
           <div className="flex items-center gap-2 bg-gray-100 rounded-xl px-4 py-2 text-sm font-medium text-gray-700">
             <span>🎲</span>
             <span>
-              {product.minPlayers}–{product.maxPlayers ?? product.minPlayers} players
+              {product.minPlayers}–{product.maxPlayers ?? product.minPlayers} Giocatori
             </span>
           </div>
         )}
@@ -151,7 +151,7 @@ export default function ProductPageClient({ slug }: Props) {
               >
                 <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
               </svg>
-              Added to Cart
+              Aggiunto Al Carrello
             </>
           ) : inCart ? (
             <>
@@ -168,10 +168,10 @@ export default function ProductPageClient({ slug }: Props) {
                   d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13l-1.5 6h13L17 13M7 13L5.4 5M17 13l1.5 6M9 21a1 1 0 100-2 1 1 0 000 2zm6 0a1 1 0 100-2 1 1 0 000 2z"
                 />
               </svg>
-              Go to Cart
+              Vai Al Carrello
             </>
           ) : product.quantity === 0 ? (<> Unavailable </>) : (
-            <>Add to Cart: {product.price}€</>
+            <>Aggiungi Al Carrello: {product.price}€</>
           )}
         </button>
       </div>

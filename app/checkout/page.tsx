@@ -8,14 +8,13 @@ import { ChevronDown, ChevronUp } from 'lucide-react';
 import Footer from '@/components/layout/Footer';
 import AutocompleteInput from '@/components/AutocompleteInput';
 
-const VALID_CITIES = ['Milano', 'Roma', 'Firenze', 'Torino', 'Sangano'];
+const VALID_CITIES = ['Sangano', 'Bruino', 'Rivalta di Torino', 'Orbassano'];
 
 const CITY_MAP: Record<string, string> = {
-  Torino: 'Turin',
-  Roma: 'Rome',
-  Firenze: 'Florence',
-  Milano: 'Milan',
-  Napoli: 'Naples',
+  Sangano: 'Sangano',
+  Bruino: 'Bruino',
+  Rivalta: 'Rivalta di Torino',
+  Orbassano: 'Orbassano',
 };
 
 function getValidDeliveryDates() {
@@ -165,13 +164,13 @@ const handleSubmit = async () => {
       <div className="max-w-2xl mx-auto mt-10 p-4 bg-neutral-100 shadow rounded-lg space-y-6">
         <h1 className="text-2xl font-bold">Checkout</h1>
 
-        {/* Order Recap */}
+        {/* Riassunto dell' ordine */}
         <div>
           <button
             onClick={() => setShowRecap(!showRecap)}
             className="w-full p-3 flex justify-between items-center text-left bg-gray-100 hover:bg-gray-200 rounded-t-lg"
           >
-            <span className="font-medium">Order Recap ({items.length} items)</span>
+            <span className="font-medium">Riassunto dell' ordine ({items.length} articoli)</span>
             {showRecap ? <ChevronUp size={18} /> : <ChevronDown size={18} />}
           </button>
           {showRecap && (
@@ -185,7 +184,7 @@ const handleSubmit = async () => {
                   />
                   <div className="flex-1">
                     <p className="font-semibold">{item.name}</p>
-                    <p className="text-sm text-gray-600">Quantity: {item.quantity}</p>
+                    <p className="text-sm text-gray-600">Quantità: {item.quantity}</p>
                   </div>
                   <p className="font-semibold">{(item.price * item.quantity).toFixed(2)} €</p>
                 </li>
@@ -212,13 +211,13 @@ const handleSubmit = async () => {
 
 {/* City */}
 <div>
-  <label className="block font-medium mb-1">City *</label>
+  <label className="block font-medium mb-1">Città *</label>
   <select
     value={form.city}
     onChange={(e) => handleChange('city', e.target.value)}
     className="w-full px-4 py-2 border rounded"
   >
-    <option value="">Select your city...</option>
+    <option value="">Seleziona il tuo paese...</option>
     {VALID_CITIES.map((city) => (
       <option key={city} value={city}>
         {city}
@@ -226,22 +225,22 @@ const handleSubmit = async () => {
     ))}
   </select>
               <div className="mt-1 text-sm">
-                Not available in your city?
+                Non Disponibile nella tua città?
                  <Link href="/help" className="text-blue-600 underline">
-                   Let us know
+                   Contattaci
                   </Link>
               </div>
 </div>
 
 {/* Address */}
 <div>
-  <label className="block font-medium mb-1">Address *</label>
+  <label className="block font-medium mb-1">Indirizzo *</label>
   <AutocompleteInput
  mode="address"
     value={form.address}
 cityFilter={CITY_MAP[form.city] || form.city}
     onChange={(val) => handleChange('address', val)}
-    placeholder="Start typing your address..."
+    placeholder="Digita un indirizzo..."
   />
   {form.address.trim().length === 0 && touched.address && (
     <p className="text-red-600 text-sm mt-1">Address is required.</p>
@@ -252,7 +251,7 @@ cityFilter={CITY_MAP[form.city] || form.city}
   <div className="mt-4 space-y-4">
     {/* Delivery Date Selector */}
     <div>
-      <label className="block font-medium mb-1">Delivery Date *</label>
+      <label className="block font-medium mb-1">Data di Consegna *</label>
       <select
         className="w-full px-4 py-2 border rounded"
         value={deliveryDate}
@@ -263,7 +262,7 @@ cityFilter={CITY_MAP[form.city] || form.city}
       >
         {getValidDeliveryDates().map((date) => (
           <option key={date} value={date}>
-            {new Date(date).toLocaleDateString(undefined, {
+            {new Date(date).toLocaleDateString("it-IT", {
               weekday: 'long',
               year: 'numeric',
               month: 'long',
@@ -277,7 +276,7 @@ cityFilter={CITY_MAP[form.city] || form.city}
     {/* Delivery Time Slot Selector */}
     {deliveryDate && (
       <div>
-        <label className="block font-medium mb-1">Delivery Time Slot *</label>
+        <label className="block font-medium mb-1">Fascia Oraria *</label>
         <select
           className="w-full px-4 py-2 border rounded"
           value={deliverySlot}
@@ -293,7 +292,7 @@ cityFilter={CITY_MAP[form.city] || form.city}
 
           {/* Phone Number */}
           <div>
-            <label className="block font-medium mb-1">Phone Number *</label>
+            <label className="block font-medium mb-1">Numero di Telefono *</label>
             <input
               type="tel"
               value={form.phone}
@@ -308,15 +307,15 @@ cityFilter={CITY_MAP[form.city] || form.city}
                 onClick={sendCode}
                 className="mt-2 px-4 py-2 text-sm bg-blue-600 hover:bg-blue-700 text-white rounded"
               >
-                Send Verification Code
+                Invia SMS di verifica
               </button>
             )}
           </div>
 
-          {/* Verification Code */}
+          {/* Codice di verifica */}
           {codeSent && (
             <div>
-              <label className="block font-medium mb-1">Verification Code *</label>
+              <label className="block font-medium mb-1">Codice di Verifica *</label>
               <input
                 type="text"
                 value={code}
@@ -327,7 +326,7 @@ cityFilter={CITY_MAP[form.city] || form.city}
                 className="mt-2 text-sm text-blue-600 underline"
                 onClick={resendCode}
               >
-                Resend code
+                Invia di nuovo
               </button>
             </div>
           )}
@@ -347,15 +346,14 @@ cityFilter={CITY_MAP[form.city] || form.city}
               onChange={(e) => setTermsAccepted(e.target.checked)}
               className="mr-2"
             />
-            <label>I accept the terms and conditions *</label>
+            <label>Accetto I <Link href="/terms" target="_blank" rel="noopener noreferrer" className="text-blue-600 underline"> Termini e Condizioni </Link> *</label>
           </div>
 
           <div className="flex items-center">
             <input type="checkbox" disabled checked readOnly className="mr-2" />
-            <label>I will pay at the delivery with cash or other digital payments</label>
+            <label>Paghero' alla consegna in contanti o con satispay</label>
           </div>
         </div>
-
         {/* Submit Button */}
         <button
           onClick={handleSubmit}
@@ -366,7 +364,7 @@ cityFilter={CITY_MAP[form.city] || form.city}
               : 'bg-gray-400 cursor-not-allowed'
           }`}
         >
-          Confirm Order
+          Conferma Ordine
         </button>
       </div>
 

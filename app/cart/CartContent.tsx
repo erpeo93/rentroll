@@ -39,19 +39,19 @@ const searchParams = useSearchParams();
         <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7"></path>
         </svg>
-        Go back to catalogue
+        Torna al Catalogo
       </button>
 
 {searchParams.get('update') === 'true' && (
   <div className="mb-4 p-3 bg-yellow-100 border border-yellow-400 text-yellow-800 rounded">
-    Some items in your cart were updated due to limited availability.
+    Alcuni oggetti nel tuo carrello sono stati aggiornati a causa di aggiornamenti nel nostro inventario.
   </div>
 )}
         <div className="w-full max-w-full  sm:max-w-3xl rounded-xl p-6 bg-neutral-100 shadow-sm">
-          <h1 className="text-2xl font-bold mb-6">Your Cart</h1>
+          <h1 className="text-2xl font-bold mb-6">Carrello</h1>
 
           {items.length === 0 ? (
-            <p>Your cart is empty.</p>
+            <p>Il tuo carrello e' vuoto.</p>
           ) : (
             <>
               <ul className="divide-y divide-gray-300">
@@ -105,7 +105,7 @@ const searchParams = useSearchParams();
                         </button>
                       </div>
                       <span className="text-sm text-gray-700 mt-1">
-                        Total: €{(item.quantity * item.price).toFixed(2)}
+                        Totale: €{(item.quantity * item.price).toFixed(2)}
                       </span>
                     </div>
                   </li>
@@ -114,7 +114,7 @@ const searchParams = useSearchParams();
 
               {/* Total Order Summary */}
               <div className="mt-6 text-right font-semibold text-lg">
-                Order Total: €{getTotalPrice().toFixed(2)}
+                Totale Ordine: €{getTotalPrice().toFixed(2)}
               </div>
 
               {/* Buttons */}
@@ -123,14 +123,14 @@ const searchParams = useSearchParams();
                   onClick={() => router.push('/checkout')}
                   className="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700"
                 >
-                  Proceed to Checkout
+                  Procedi all' acquisto
                 </button>
 
                 <button
                   onClick={clearCart}
                   className="text-sm text-gray-600 hover:underline"
                 >
-                  Clear Cart
+                  Svuota Carrello
                 </button>
               </div>
             </>

@@ -2,12 +2,9 @@
 
 import en from '../i18n/en.json';
 import it from '../i18n/it.json';
-import { createContext, useContext, useCallback, useEffect, useState } from 'react';
-import { useSearchParams, useRouter } from 'next/navigation';
+import { createContext, useContext, useCallback, useState } from 'react';
 
-type TranslationDict = {
-  [key: string]: string;
-};
+type TranslationDict = Record<string, string>;
 
 const translations: Record<'en' | 'it', TranslationDict> = {
   en,
@@ -26,7 +23,13 @@ const I18nContext = createContext<{
   toggleLanguage: () => {},
 });
 
-export function I18nProvider({ lang, children }: { lang: Lang; children: React.ReactNode }) {
+export function I18nProvider({
+  lang,
+  children,
+}: {
+  lang: Lang;
+  children: React.ReactNode;
+}) {
   const [currentLang, setCurrentLang] = useState<Lang>(lang);
 
   const t = (key: string): string => {

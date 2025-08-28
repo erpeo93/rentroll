@@ -70,7 +70,7 @@ export default function Header() {
           className="text-xl font-bold cursor-pointer"
           onClick={() => router.push('/')}
         >
-          RentRoll
+          Arcade
         </div>
 
         {/* Desktop navigation */}
@@ -87,12 +87,14 @@ export default function Header() {
           >
             {t('consumables')}
           </button>
+{/*
           <button
             className="text-button px-3 py-1.5 text-xs sm:text-sm"
             onClick={handleSurprise}
           >
             {t('surprise_me')}
           </button>
+*/}
         </nav>
 
         {/* Mobile hamburger menu */}

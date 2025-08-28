@@ -1,15 +1,14 @@
 'use client';
 
 import { useEffect } from 'react';
-import { useTranslation } from '../../lib/i18n';
+import { useTranslation } from '@/lib/i18n';
 import faqEn from '../../i18n/faq.en.json';
 import faqIt from '../../i18n/faq.it.json';
 import { ModalWrapper, CloseButton } from './ModalStyles';
 
 export default function FAQModal({ onClose }: { onClose: () => void }) {
-  const { t } = useTranslation();
-  const lang = typeof window !== 'undefined' && navigator.language.startsWith('it') ? 'it' : 'en';
-  const faq = lang === 'it' ? faqIt : faqEn;
+const { t, language } = useTranslation();
+  const faq = language === 'it' ? faqIt : faqEn;
 
 useEffect(() => {
   const scrollY = window.scrollY;
@@ -51,13 +50,15 @@ useEffect(() => {
           </li>
         ))}
       </ul>
+{/*
       <a
         href="/terms"
         target="_blank"
         className="mt-6 inline-block text-blue-600 underline"
       >
-        View Terms & Conditions
+        Vedi termini e condizioni
       </a>
+*/}
     </ModalWrapper>
   );
 }
