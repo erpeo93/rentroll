@@ -79,6 +79,7 @@ model Intent {
   confirmationToken String?
   createdAt  DateTime @default(now())
   products        IntentProduct[]
+  deliveryFee  Float?
 }
 
 model IntentProduct {

@@ -9,6 +9,7 @@ export async function sendOrderEmail({
   phone,
   deliveryStart,
   deliveryEnd,
+  deliveryFee,
 }: {
   to: string;
   items: { name: string; quantity: number; price: number }[];
@@ -17,6 +18,7 @@ export async function sendOrderEmail({
   phone: string;
   deliveryStart: Date;
   deliveryEnd: Date;
+  deliveryFee: number;
 }) {
   const total = items.reduce((sum, item) => sum + item.quantity * item.price, 0);
 
@@ -56,7 +58,8 @@ export async function sendOrderEmail({
         .join("")}
     </ul>
 
-    <h3>Totale: €${total.toFixed(2)}</h3>
+    <h3>Consegna: €${deliveryFee.toFixed(2)}</h3>
+    <h3>Totale: €${(total + deliveryFee).toFixed(2)}</h3>
   `;
 
   const host = process.env.MAILTRAP_HOST;

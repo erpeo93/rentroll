@@ -15,7 +15,8 @@ export async function POST(req: Request) {
     code,
     items,
     deliveryWindowStart,
-    deliveryWindowEnd
+    deliveryWindowEnd,
+    deliveryFee
   } = await req.json();
   
   let adj_phone = phone
@@ -80,6 +81,7 @@ const intent = await tx.intent.create({
     status: 'verified',
     deliveryWindowStart: new Date(deliveryWindowStart),
     deliveryWindowEnd: new Date(deliveryWindowEnd),
+    deliveryFee: deliveryFee,
     products: {
       create: items.map((item: any) => ({
         productId: item.id,
@@ -109,6 +111,7 @@ await sendOrderEmail({
   phone: adj_phone,
   deliveryStart: deliveryWindowStart,
   deliveryEnd: deliveryWindowEnd,
+  deliveryFee: deliveryFee,
 });
 
 let adminemail = process.env.ADMIN_EMAIL!
@@ -124,6 +127,7 @@ await sendOrderEmail({
   phone: adj_phone,
   deliveryStart: deliveryWindowStart,
   deliveryEnd: deliveryWindowEnd,
+  deliveryFee: deliveryFee,
 });
 
     return intent;

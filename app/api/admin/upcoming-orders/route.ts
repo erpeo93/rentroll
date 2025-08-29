@@ -25,6 +25,7 @@ export async function GET(req: NextRequest) {
     deliveryWindowEnd: intent.deliveryWindowEnd,
     email: intent.email,
     phone: intent.phone,
+    deliveryFee: intent.deliveryFee,
     products: intent.products.map((ip) => ({
       productId: ip.productId,
       name: ip.product.name,

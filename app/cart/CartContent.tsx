@@ -7,12 +7,13 @@ import { useRouter } from 'next/navigation';
 import { useCart } from '@/lib/cart-context';
 import Footer from '../../components/layout/Footer';
 
+const DELIVERY_FEE = 5; // adjust this value as needed
 
 export default function CartContent() {
-const searchParams = useSearchParams();
+  const searchParams = useSearchParams();
   const { items, updateQuantity, clearCart, getTotalPrice } = useCart();
   const router = useRouter();
- const [showUpdateBanner, setShowUpdateBanner] = useState(false);
+  const [showUpdateBanner, setShowUpdateBanner] = useState(false);
 
   const handleDecrease = (id: string, quantity: number) => {
     if (quantity <= 1) {
@@ -26,118 +27,141 @@ const searchParams = useSearchParams();
     if (searchParams.get('update') === 'true') {
       setShowUpdateBanner(true);
     }
-  },[searchParams]);
+  }, [searchParams]);
 
   return (
     <main className="px-0">
       <div className="px-0 py-10 flex justify-center">
-<div className="w-full max-w-full sm:max-w-3xl rounded-xl p-3">
-      <button
-        onClick={() => router.push('/catalogue')}
-        className="inline-flex items-center gap-2 mb-6"
-      >
-        <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7"></path>
-        </svg>
-        Torna al Catalogo
-      </button>
+        <div className="w-full max-w-full sm:max-w-3xl rounded-xl p-3">
+          <button
+            onClick={() => router.push('/catalogue')}
+            className="inline-flex items-center gap-2 mb-6"
+          >
+            <svg
+              className="w-5 h-5"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              viewBox="0 0 24 24"
+            >
+              <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7"></path>
+            </svg>
+            Torna al Catalogo
+          </button>
 
-{searchParams.get('update') === 'true' && (
-  <div className="mb-4 p-3 bg-yellow-100 border border-yellow-400 text-yellow-800 rounded">
-    Alcuni oggetti nel tuo carrello sono stati aggiornati a causa di aggiornamenti nel nostro inventario.
-  </div>
-)}
-        <div className="w-full max-w-full  sm:max-w-3xl rounded-xl p-6 bg-neutral-100 shadow-sm">
-          <h1 className="text-2xl font-bold mb-6">Carrello</h1>
-
-          {items.length === 0 ? (
-            <p>Il tuo carrello e' vuoto.</p>
-          ) : (
-            <>
-              <ul className="divide-y divide-gray-300">
-                {items.map((item) => (
-                  <li key={item.id} className="py-4 flex gap-4 items-center">
-                    {/* Image */}
-                    <img
-                      src={item.image}
-                      alt={item.name}
-                      className="w-20 h-20 object-cover rounded-xl border"
-                    />
-
-                    {/* Details */}
-                    <div className="flex-1">
-<p className={`font-semibold text-lg word-break ${item.unavailable || item.adjusted ? 'text-red-600' : ''}`}>
-  {item.name}
-</p>
-
-{item.unavailable && (
-  <p className="text-sm text-red-600 mt-1 line-clamp-2">This product is no longer available.</p>
-)}
-
-{item.adjusted && (
-  <p className="text-sm text-orange-600 mt-1 line-clamp-2">
-    Only {item.quantity} available, cart updated accordingly.
-  </p>
-)}
-
-                      {item.description && (
-                        <p className="text-sm text-gray-600 mt-1 line-clamp-2">
-                          {item.description}
-                        </p>
-                      )}
-                    </div>
-
-                    {/* Quantity + Total */}
-                    <div className="flex flex-col items-center gap-2">
-                      <div className="flex items-center quantity-control gap-2">
-                        <button
-                          onClick={() => handleDecrease(item.id, item.quantity)}
-                          className="btn-quantity"
-                        >
-                          –
-                        </button>
-                        <span className="quantity-label text-md w-6 text-center">{item.quantity}</span>
-                        <button
-                          onClick={() => updateQuantity(item.id, item.quantity + 1)}
-                          className="btn-quantity"
-                        >
-                          +
-                        </button>
-                      </div>
-                      <span className="text-sm text-gray-700 mt-1">
-                        Totale: €{(item.quantity * item.price).toFixed(2)}
-                      </span>
-                    </div>
-                  </li>
-                ))}
-              </ul>
-
-              {/* Total Order Summary */}
-              <div className="mt-6 text-right font-semibold text-lg">
-                Totale Ordine: €{getTotalPrice().toFixed(2)}
-              </div>
-
-              {/* Buttons */}
-              <div className="mt-6 flex justify-between items-center">
-                <button
-                  onClick={() => router.push('/checkout')}
-                  className="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700"
-                >
-                  Procedi all' acquisto
-                </button>
-
-                <button
-                  onClick={clearCart}
-                  className="text-sm text-gray-600 hover:underline"
-                >
-                  Svuota Carrello
-                </button>
-              </div>
-            </>
+          {searchParams.get('update') === 'true' && (
+            <div className="mb-4 p-3 bg-yellow-100 border border-yellow-400 text-yellow-800 rounded">
+              Alcuni oggetti nel tuo carrello sono stati aggiornati a causa di aggiornamenti nel nostro inventario.
+            </div>
           )}
+
+          <div className="w-full max-w-full sm:max-w-3xl rounded-xl p-6 bg-neutral-100 shadow-sm">
+            <h1 className="text-2xl font-bold mb-6">Carrello</h1>
+
+            {items.length === 0 ? (
+              <p>Il tuo carrello e' vuoto.</p>
+            ) : (
+              <>
+                <ul className="divide-y divide-gray-300">
+                  {items.map((item) => (
+                    <li key={item.id} className="py-4 flex gap-4 items-center">
+                      {/* Image */}
+                      <img
+                        src={item.image}
+                        alt={item.name}
+                        className="w-20 h-20 object-cover rounded-xl border"
+                      />
+
+                      {/* Details */}
+                      <div className="flex-1">
+                        <p
+                          className={`font-semibold text-lg word-break ${
+                            item.unavailable || item.adjusted ? 'text-red-600' : ''
+                          }`}
+                        >
+                          {item.name}
+                        </p>
+
+                        {item.unavailable && (
+                          <p className="text-sm text-red-600 mt-1 line-clamp-2">
+                            This product is no longer available.
+                          </p>
+                        )}
+
+                        {item.adjusted && (
+                          <p className="text-sm text-orange-600 mt-1 line-clamp-2">
+                            Only {item.quantity} available, cart updated accordingly.
+                          </p>
+                        )}
+
+                        {item.description && (
+                          <p className="text-sm text-gray-600 mt-1 line-clamp-2">
+                            {item.description}
+                          </p>
+                        )}
+                      </div>
+
+                      {/* Quantity + Total */}
+                      <div className="flex flex-col items-center gap-2">
+                        <div className="flex items-center quantity-control gap-2">
+                          <button
+                            onClick={() => handleDecrease(item.id, item.quantity)}
+                            className="btn-quantity"
+                          >
+                            –
+                          </button>
+                          <span className="quantity-label text-md w-6 text-center">
+                            {item.quantity}
+                          </span>
+                          <button
+                            onClick={() => updateQuantity(item.id, item.quantity + 1)}
+                            className="btn-quantity"
+                          >
+                            +
+                          </button>
+                        </div>
+                        <span className="text-sm text-gray-700 mt-1">
+                          Totale: €{(item.quantity * item.price).toFixed(2)}
+                        </span>
+                      </div>
+                    </li>
+                  ))}
+                </ul>
+
+                {/* Total Order Summary */}
+                <div className="mt-6 text-right space-y-1">
+                  <div className="text-lg font-semibold">
+                    Subtotale: €{getTotalPrice().toFixed(2)}
+                  </div>
+                  <div className="text-sm font-normal text-gray-700">
+                    Consegna: €{DELIVERY_FEE.toFixed(2)}
+                  </div>
+                  <div className="border-t pt-2 text-xl font-bold">
+                    Totale: €{(getTotalPrice() + DELIVERY_FEE).toFixed(2)}
+                  </div>
+                </div>
+
+                {/* Buttons */}
+                <div className="mt-6 flex justify-between items-center">
+                  <button
+                    onClick={() => router.push('/checkout')}
+                    className="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700"
+                  >
+                    Procedi all' acquisto
+                  </button>
+
+                  <button
+                    onClick={clearCart}
+                    className="text-sm text-gray-600 hover:underline"
+                  >
+                    Svuota Carrello
+                  </button>
+                </div>
+              </>
+            )}
+          </div>
         </div>
       </div>
-</div>
       <Footer />
     </main>
   );

@@ -17,6 +17,8 @@ const CITY_MAP: Record<string, string> = {
   Orbassano: 'Orbassano',
 };
 
+const DELIVERY_FEE = 5; // 🔹 Fixed delivery fee
+
 function getValidDeliveryDates() {
   const result: string[] = [];
   const today = new Date();
@@ -36,7 +38,7 @@ function getValidDeliveryDates() {
 const deliverySlots = ["18-20", "20-22"];
 
 export default function CheckoutPage() {
-const validDates = useMemo(() => getValidDeliveryDates(), []);
+  const validDates = useMemo(() => getValidDeliveryDates(), []);
   const { items, getTotalPrice, clearCart, updateQuantity } = useCart();
   const router = useRouter();
 
@@ -49,11 +51,10 @@ const validDates = useMemo(() => getValidDeliveryDates(), []);
   });
   const [touched, setTouched] = useState<Record<string, boolean>>({});
   const [termsAccepted, setTermsAccepted] = useState(false);
-const [deliveryDate, setDeliveryDate] = useState('');
-const [deliverySlot, setDeliverySlot] = useState('');
+  const [deliveryDate, setDeliveryDate] = useState('');
+  const [deliverySlot, setDeliverySlot] = useState('');
   const [codeSent, setCodeSent] = useState(false);
   const [code, setCode] = useState('');
-
 
   useEffect(() => {
     if (validDates.length > 0) {
@@ -67,12 +68,12 @@ const [deliverySlot, setDeliverySlot] = useState('');
   const isValidPhone = /^\d{10}$/.test(form.phone.trim());
   const isValidAddress = form.address.trim().length > 0
 
-const validDeliveryDates = getValidDeliveryDates();
+  const validDeliveryDates = getValidDeliveryDates();
 
-const isValidDelivery = 
-  deliveryDate !== '' &&
-  deliverySlot !== '' &&
-  validDeliveryDates.includes(deliveryDate);
+  const isValidDelivery = 
+    deliveryDate !== '' &&
+    deliverySlot !== '' &&
+    validDeliveryDates.includes(deliveryDate);
 
   const isFormValid =
     isValidEmail(form.email) &&
@@ -82,20 +83,21 @@ const isValidDelivery =
     isValidPhone &&
     termsAccepted;
 
-const handleChange = (field: keyof typeof form, value: string) => {
-  setForm((prev) => {
-    const updatedForm = { ...prev, [field]: value };
+  const handleChange = (field: keyof typeof form, value: string) => {
+    setForm((prev) => {
+      const updatedForm = { ...prev, [field]: value };
 
-    // Reset address if city changes
-    if (field === 'city' && value !== prev.city) {
-      updatedForm.address = '';
-    }
+      // Reset address if city changes
+      if (field === 'city' && value !== prev.city) {
+        updatedForm.address = '';
+      }
 
-    return updatedForm;
-  });
+      return updatedForm;
+    });
 
-  setTouched((prev) => ({ ...prev, [field]: true }));
-};
+    setTouched((prev) => ({ ...prev, [field]: true }));
+  };
+
   const sendCode = async () => {
     if (!isValidPhone) {
       alert('Enter a valid 10-digit phone number first.');
@@ -118,46 +120,47 @@ const handleChange = (field: keyof typeof form, value: string) => {
     sendCode();
   };
 
-const handleSubmit = async () => {
-  const [startHour, endHour] = deliverySlot.split('-').map(Number);
-  const baseDate = new Date(deliveryDate);
-  
-  const deliveryWindowStart = new Date(baseDate);
-  deliveryWindowStart.setHours(startHour, 0, 0, 0);
+  const handleSubmit = async () => {
+    const [startHour, endHour] = deliverySlot.split('-').map(Number);
+    const baseDate = new Date(deliveryDate);
+    
+    const deliveryWindowStart = new Date(baseDate);
+    deliveryWindowStart.setHours(startHour, 0, 0, 0);
 
-  const deliveryWindowEnd = new Date(baseDate);
-  deliveryWindowEnd.setHours(endHour, 0, 0, 0);
+    const deliveryWindowEnd = new Date(baseDate);
+    deliveryWindowEnd.setHours(endHour, 0, 0, 0);
 
-  const res = await fetch('/api/checkout/verify-and-submit', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      ...form,
-      code,
-      items,
-      deliveryWindowStart: deliveryWindowStart.toISOString(),
-      deliveryWindowEnd: deliveryWindowEnd.toISOString(),
-    }),
-  });
+    const res = await fetch('/api/checkout/verify-and-submit', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        ...form,
+        code,
+        items,
+        deliveryWindowStart: deliveryWindowStart.toISOString(),
+        deliveryWindowEnd: deliveryWindowEnd.toISOString(),
+        deliveryFee: DELIVERY_FEE, // 🔹 send total with delivery
+      }),
+    });
 
-  if (res.ok) {
-    clearCart();
-    router.push('/checkout/thank-you');
-  } else if (res.status === 409) {
-    const data = await res.json();
-    if (data?.items?.length) {
-      for (const item of data.items) {
-        updateQuantity(item.id, item.quantity, {
-          adjusted: item.adjusted,
-          unavailable: item.unavailable,
-        });
+    if (res.ok) {
+      clearCart();
+      router.push('/checkout/thank-you');
+    } else if (res.status === 409) {
+      const data = await res.json();
+      if (data?.items?.length) {
+        for (const item of data.items) {
+          updateQuantity(item.id, item.quantity, {
+            adjusted: item.adjusted,
+            unavailable: item.unavailable,
+          });
+        }
       }
+      router.push('/cart?update=true');
+    } else {
+      alert('Invalid code or error occurred.');
     }
-    router.push('/cart?update=true');
-  } else {
-    alert('Invalid code or error occurred.');
-  }
-};
+  };
 
   return (
     <main className="px-4">
@@ -209,86 +212,86 @@ const handleSubmit = async () => {
             )}
           </div>
 
-{/* City */}
-<div>
-  <label className="block font-medium mb-1">Città *</label>
-  <select
-    value={form.city}
-    onChange={(e) => handleChange('city', e.target.value)}
-    className="w-full px-4 py-2 border rounded"
-  >
-    <option value="">Seleziona il tuo paese...</option>
-    {VALID_CITIES.map((city) => (
-      <option key={city} value={city}>
-        {city}
-      </option>
-    ))}
-  </select>
-              <div className="mt-1 text-sm">
-                Non Disponibile nella tua città?
-                 <Link href="/help" className="text-blue-600 underline">
-                   Contattaci
-                  </Link>
+          {/* City */}
+          <div>
+            <label className="block font-medium mb-1">Città *</label>
+            <select
+              value={form.city}
+              onChange={(e) => handleChange('city', e.target.value)}
+              className="w-full px-4 py-2 border rounded"
+            >
+              <option value="">Seleziona il tuo paese...</option>
+              {VALID_CITIES.map((city) => (
+                <option key={city} value={city}>
+                  {city}
+                </option>
+              ))}
+            </select>
+            <div className="mt-1 text-sm">
+              Non Disponibile nella tua città?
+              <Link href="/help" className="text-blue-600 underline">
+                Contattaci
+              </Link>
+            </div>
+          </div>
+
+          {/* Address */}
+          <div>
+            <label className="block font-medium mb-1">Indirizzo *</label>
+            <AutocompleteInput
+              mode="address"
+              value={form.address}
+              cityFilter={CITY_MAP[form.city] || form.city}
+              onChange={(val) => handleChange('address', val)}
+              placeholder="Digita un indirizzo..."
+            />
+            {form.address.trim().length === 0 && touched.address && (
+              <p className="text-red-600 text-sm mt-1">Address is required.</p>
+            )}
+          </div>
+
+          {form.city && form.address && (
+            <div className="mt-4 space-y-4">
+              {/* Delivery Date Selector */}
+              <div>
+                <label className="block font-medium mb-1">Data di Consegna *</label>
+                <select
+                  className="w-full px-4 py-2 border rounded"
+                  value={deliveryDate}
+                  onChange={(e) => {
+                    setDeliveryDate(e.target.value);
+                    setDeliverySlot(deliverySlots[0]); // Reset slot when date changes
+                  }}
+                >
+                  {getValidDeliveryDates().map((date) => (
+                    <option key={date} value={date}>
+                      {new Date(date).toLocaleDateString("it-IT", {
+                        weekday: 'long',
+                        year: 'numeric',
+                        month: 'long',
+                        day: 'numeric',
+                      })}
+                    </option>
+                  ))}
+                </select>
               </div>
-</div>
 
-{/* Address */}
-<div>
-  <label className="block font-medium mb-1">Indirizzo *</label>
-  <AutocompleteInput
- mode="address"
-    value={form.address}
-cityFilter={CITY_MAP[form.city] || form.city}
-    onChange={(val) => handleChange('address', val)}
-    placeholder="Digita un indirizzo..."
-  />
-  {form.address.trim().length === 0 && touched.address && (
-    <p className="text-red-600 text-sm mt-1">Address is required.</p>
-  )}
-</div>
-
-{form.city && form.address && (
-  <div className="mt-4 space-y-4">
-    {/* Delivery Date Selector */}
-    <div>
-      <label className="block font-medium mb-1">Data di Consegna *</label>
-      <select
-        className="w-full px-4 py-2 border rounded"
-        value={deliveryDate}
-        onChange={(e) => {
-          setDeliveryDate(e.target.value);
-          setDeliverySlot(deliverySlots[0]); // Reset slot when date changes
-        }}
-      >
-        {getValidDeliveryDates().map((date) => (
-          <option key={date} value={date}>
-            {new Date(date).toLocaleDateString("it-IT", {
-              weekday: 'long',
-              year: 'numeric',
-              month: 'long',
-              day: 'numeric',
-            })}
-          </option>
-        ))}
-      </select>
-    </div>
-
-    {/* Delivery Time Slot Selector */}
-    {deliveryDate && (
-      <div>
-        <label className="block font-medium mb-1">Fascia Oraria *</label>
-        <select
-          className="w-full px-4 py-2 border rounded"
-          value={deliverySlot}
-          onChange={(e) => setDeliverySlot(e.target.value)}
-        >
-          <option value="18-20">18:00 - 20:00</option>
-          <option value="20-22">20:00 - 22:00</option>
-        </select>
-      </div>
-    )}
-  </div>
-)}
+              {/* Delivery Time Slot Selector */}
+              {deliveryDate && (
+                <div>
+                  <label className="block font-medium mb-1">Fascia Oraria *</label>
+                  <select
+                    className="w-full px-4 py-2 border rounded"
+                    value={deliverySlot}
+                    onChange={(e) => setDeliverySlot(e.target.value)}
+                  >
+                    <option value="18-20">18:00 - 20:00</option>
+                    <option value="20-22">20:00 - 22:00</option>
+                  </select>
+                </div>
+              )}
+            </div>
+          )}
 
           {/* Phone Number */}
           <div>
@@ -333,8 +336,12 @@ cityFilter={CITY_MAP[form.city] || form.city}
         </div>
 
         {/* Order Total */}
-        <div className="text-xl font-semibold text-right">
-          Total: €{getTotalPrice().toFixed(2)}
+        <div className="text-xl font-semibold text-right space-y-1">
+          <div>Subtotale: €{getTotalPrice().toFixed(2)}</div>
+          <div className="text-s font-normal">Consegna: €{DELIVERY_FEE.toFixed(2)}</div>
+          <div className="border-t pt-2">
+            Totale: €{(getTotalPrice() + DELIVERY_FEE).toFixed(2)}
+          </div>
         </div>
 
         {/* Checkboxes */}
@@ -354,6 +361,7 @@ cityFilter={CITY_MAP[form.city] || form.city}
             <label>Paghero' alla consegna in contanti o con satispay</label>
           </div>
         </div>
+        
         {/* Submit Button */}
         <button
           onClick={handleSubmit}

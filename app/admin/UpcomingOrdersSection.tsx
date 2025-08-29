@@ -9,6 +9,7 @@ type IntentDTO = {
   address?: string | null
   deliveryWindowStart: string
   deliveryWindowEnd?: string | null
+  deliveryFee? : number | null
   email?: string | null
   phone?: string | null
   products: { productId: string; name: string; quantity: number; price: number }[]
@@ -54,13 +55,14 @@ export default function UpcomingOrdersSection() {
             className="w-full text-left px-4 py-2 bg-gray-100 font-semibold"
             onClick={() => toggle(intent.id)}
           >
-            {intent.city || '—'} • {intent.address || '—'} • {new Date(intent.deliveryWindowStart).toLocaleString()} — Total €{totalValue(intent.products).toFixed(2)}
+            {intent.city || '—'} • {intent.address || '—'} • {new Date(intent.deliveryWindowStart).toLocaleString()} — Total €{(totalValue(intent.products) + (intent.deliveryFee || 0)).toFixed(2)}
             <span className="float-right">{openIds.has(intent.id) ? '▲' : '▼'}</span>
           </button>
           {openIds.has(intent.id) && (
             <div className="p-4 bg-white">
               <p>Email: {intent.email || '—'}</p>
               <p>Phone: {intent.phone || '—'}</p>
+              <p>DeliveryFee: {intent.deliveryFee || '—'}</p>
               <table className="w-full text-sm border mt-2">
                 <thead className="bg-gray-50">
                   <tr>
@@ -84,7 +86,7 @@ export default function UpcomingOrdersSection() {
                   <tr className="font-semibold">
                     <td colSpan={3} className="border px-2 py-1 text-right">Order Total:</td>
                     <td className="border px-2 py-1 text-right">
-                      €{totalValue(intent.products).toFixed(2)}
+                      €{(totalValue(intent.products) + (intent.deliveryFee || 0)).toFixed(2)}
                     </td>
                   </tr>
                 </tbody>
